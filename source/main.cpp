@@ -14,6 +14,7 @@
 #include "Game.h"
 #include "Helpers.h"
 #include "Node.h"
+#include "TreePretty.h"
 
 int main(int argc, char** argv)
 {
@@ -104,6 +105,8 @@ int main(int argc, char** argv)
 
 		GameState::InitializeNeighbors(width, height);
 
+		printf("Equation: %s\n", Brain::Test(random).c_str());
+
 		// Run the EA!
 		for (int run = 0; run < runs_value; ++run)
 		{
@@ -134,14 +137,16 @@ int main(int argc, char** argv)
 				if (fitness > best_fitness)
 				{
 					best_fitness = fitness;
+
+					delete[] best_buffer;
 					best_buffer = buffer_start;
+
+					fprintf(score_file, "%i\t%i\n", eval + 1, best_fitness);
 				}
 				else
 				{
 					delete[] buffer_start;
 				}
-
-				fprintf(score_file, "%i\t%i\n", eval + 1, best_fitness);
 			}
 		}
 

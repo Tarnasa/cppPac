@@ -7,6 +7,7 @@
 #include <vector>
 #include <stdarg.h>
 #include <cstdio>
+#include <random>
 
 template<class ContainerType, class PredicateType>
 bool any(const ContainerType& container, const PredicateType& predicate)
@@ -37,3 +38,15 @@ T clamp(T low, T high, T input)
 int get_length_int(int n);
 
 int get_printf_length(int max_length, const char* format, ...);
+
+template<typename T>
+T choice(std::mt19937& random, const std::vector<T>& container)
+{
+	return container[std::uniform_int_distribution<int>(0, container.size() - 1)(random)];
+}
+
+int random_int(std::mt19937& random, int min, int max);
+
+bool chance(std::mt19937& random, double chance);
+
+std::string replace(const std::string& s, const std::string& search, const std::string& replacement);

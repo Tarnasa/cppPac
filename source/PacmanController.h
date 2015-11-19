@@ -33,13 +33,13 @@ namespace PacmanController
 		{
 			root.children.push_back(new Brain::ProductNode());
 				root.children[0]->children.push_back(new Brain::ConstantNode(-1.0));
-				root.children[0]->children.push_back(new Brain::PacmanToDot());
+				root.children[0]->children.push_back(new Brain::PacmanToDotNode());
 			root.children.push_back(new Brain::ProductNode());
 				root.children[1]->children.push_back(new Brain::ConstantNode(100.0));
-				root.children[1]->children.push_back(new Brain::PacmanDotsEaten());
+				root.children[1]->children.push_back(new Brain::PacmanDotsEatenNode());
 			root.children.push_back(new Brain::ProductNode());
 				root.children[2]->children.push_back(new Brain::ConstantNode(0.01));
-				root.children[2]->children.push_back(new Brain::PacmanToGhost());
+				root.children[2]->children.push_back(new Brain::PacmanToGhostNode());
 		};
 
 		double Evaluate(const GameState& state)
