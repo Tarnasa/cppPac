@@ -98,7 +98,7 @@ int Game::CalculateFitness()
 	return fitness;
 }
 
-int Game::RunTillDone(char*& world_buffer)
+int Game::RunTillDone(char* world_buffer)
 {
 	state.InitialLogEntry(world_buffer);
 	world_buffer += sprintf(world_buffer, "t %i %i\n", time_remaining, state.pacman.dots_eaten);

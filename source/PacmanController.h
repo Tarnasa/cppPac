@@ -8,6 +8,7 @@
 
 #include "GameState.h"
 #include "Node.h"
+#include "TreeGenerators.h"
 #include "Helpers.h"
 
 namespace PacmanController
@@ -27,10 +28,23 @@ namespace PacmanController
 	class PacmanController
 	{
 	public:
-		Brain::SumNode root;
+		Brain::BufferNode root;
+
+		PacmanController(std::mt19937& random, int max_levels, bool full)
+		{
+			if (full)
+			{
+				root.children.emplace_back(Brain::generateFullTree(random, max_levels));
+			}
+			else
+			{
+				root.children.emplace_back(Brain::generateTreeUpTo(random, max_levels));
+			}
+		}
 
 		PacmanController(std::mt19937& random) : root()
 		{
+			// Initialize with ramped half and 
 			root.children.push_back(new Brain::ProductNode());
 				root.children[0]->children.push_back(new Brain::ConstantNode(-1.0));
 				root.children[0]->children.push_back(new Brain::PacmanToDotNode());

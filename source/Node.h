@@ -42,6 +42,7 @@ namespace Brain
 
 	class BufferNode : public Node // Special node for the root node in a tree
 	{
+	public:
 		virtual double Forward(const GameState& state) { return children[0]->Forward(state); }
 		virtual Node* Clone() { return new BufferNode(*this); }
 		virtual char GetChar() { return '|'; }

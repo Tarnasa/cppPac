@@ -15,6 +15,7 @@
 #include "Helpers.h"
 #include "Node.h"
 #include "TreePretty.h"
+#include "Initializers.h"
 
 int main(int argc, char** argv)
 {
@@ -108,6 +109,13 @@ int main(int argc, char** argv)
 		// Run the EA!
 		for (int run = 0; run < runs_value; ++run)
 		{
+			// Initialize the set of individuals
+			auto individuals = Initializers::RampedHalfAndHalf(random, 50, 5);
+			for (auto&& individual : individuals)
+			{
+				printf("%s\n", Brain::ToEquation(&(individual.pacman_controller.root)).c_str());
+			}
+
 			int best_fitness = INT_MIN;
 
 			printf("Run %i:\n", run + 1);

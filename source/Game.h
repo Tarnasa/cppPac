@@ -27,7 +27,7 @@ public:
 	void Initialize(std::mt19937& random, double density, int time_remaining);
 
 	void Step();
-	int RunTillDone(char*& world_buffer);
+	int RunTillDone(char* world_buffer);
 
 	int CalculateFitness();
 };
