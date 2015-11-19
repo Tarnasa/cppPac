@@ -76,7 +76,7 @@ namespace Brain
 
 	Node* generateParentNode(std::mt19937& random)
 	{
-		switch (random_int(random, 0, 5))
+		switch (random_int(random, 0, 4))
 		{
 		case 0: return createNodeFromInt(random, Sum); break;
 		case 1: return createNodeFromInt(random, Subtract); break;

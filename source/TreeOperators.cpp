@@ -49,6 +49,7 @@ namespace Brain
 				node = generateParentNode(random);
 				node->children = old_node->children;
 
+				old_node->children.clear(); // Don't delete children
 				delete old_node;
 			}
 			else
@@ -65,6 +66,7 @@ namespace Brain
 				{
 					parent->children[child_index] = generateParentNode(random);
 					parent->children[child_index]->children = child->children;
+					child->children.clear(); // Don't kill the babies
 				}
 				delete child;
 			}
@@ -92,15 +94,15 @@ namespace Brain
 		}
 	}
 
-	void mutate(std::mt19937& random, Node*& root) // Applies either replace one node or grow
+	void mutate(std::mt19937& random, BufferNode* root) // Applies either replace one node or grow
 	{
-		if (chance(random, 0.5))
+		if (chance(random, 1.0))
 		{
-			replaceOneNode(random, root);
+			replaceOneNode(random, root->children[0]);
 		}
 		else
 		{
-			grow(random, root, 3);
+			grow(random, root->children[0], 3);
 		}
 	}
 

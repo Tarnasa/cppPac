@@ -105,8 +105,6 @@ int main(int argc, char** argv)
 
 		GameState::InitializeNeighbors(width, height);
 
-		printf("Equation: %s\n", Brain::Test(random).c_str());
-
 		// Run the EA!
 		for (int run = 0; run < runs_value; ++run)
 		{
