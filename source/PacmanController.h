@@ -9,6 +9,7 @@
 #include "GameState.h"
 #include "Node.h"
 #include "TreeGenerators.h"
+#include "TreeOperators.h"
 #include "Helpers.h"
 
 namespace PacmanController
@@ -42,19 +43,39 @@ namespace PacmanController
 			}
 		}
 
+		explicit PacmanController() {};
+
 		PacmanController(std::mt19937& random) : root()
 		{
-			// Initialize with ramped half and 
-			root.children.push_back(new Brain::ProductNode());
-				root.children[0]->children.push_back(new Brain::ConstantNode(-1.0));
-				root.children[0]->children.push_back(new Brain::PacmanToDotNode());
-			root.children.push_back(new Brain::ProductNode());
-				root.children[1]->children.push_back(new Brain::ConstantNode(100.0));
-				root.children[1]->children.push_back(new Brain::PacmanDotsEatenNode());
-			root.children.push_back(new Brain::ProductNode());
-				root.children[2]->children.push_back(new Brain::ConstantNode(0.01));
-				root.children[2]->children.push_back(new Brain::PacmanToGhostNode());
+			Brain::Node* sum_node = new Brain::SumNode();
+			root.children.emplace_back(sum_node);
+			sum_node->children.push_back(new Brain::ProductNode());
+			sum_node->children[0]->children.push_back(new Brain::ConstantNode(-1.0));
+			sum_node->children[0]->children.push_back(new Brain::PacmanToDotNode());
+			sum_node->children.push_back(new Brain::ProductNode());
+			sum_node->children[1]->children.push_back(new Brain::ConstantNode(100.0));
+			sum_node->children[1]->children.push_back(new Brain::PacmanDotsEatenNode());
+			// root.children.push_back(new Brain::ProductNode());
+			// root.children[2]->children.push_back(new Brain::ConstantNode(0.01));
+			// root.children[2]->children.push_back(new Brain::PacmanToGhostNode());
 		};
+
+		explicit PacmanController(const PacmanController& rhs)
+		{
+			root.children.emplace_back(Brain::createCopy(rhs.root.children[0]));
+		}
+
+		PacmanController(PacmanController&& rhs)
+		{
+			root = rhs.root;
+			rhs.root.children.clear();
+		}
+		PacmanController& operator=(PacmanController&& rhs)
+		{
+			root = rhs.root;
+			rhs.root.children.clear();
+			return *this;
+		}
 
 		double Evaluate(const GameState& state)
 		{

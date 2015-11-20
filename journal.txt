@@ -16,7 +16,6 @@ Document with graphs?
 Mutate and crossover
 Individual class
 Create initial population
-TODO:
 Calculate fitness of set of individuals
 Sort by fitness
 Select parents
@@ -26,6 +25,7 @@ Create Children
 Mutate children?
 Survive
 	Truncation
+TODO:
 	kTournament w/o replacement
 Count evals
 Check for termination
@@ -33,5 +33,7 @@ Bloat control
 Solution file
 Plots
 Make lots of constants configurable
+Make sure initial not identical
+Rename things
 
 Walls!

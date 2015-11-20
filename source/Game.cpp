@@ -9,20 +9,20 @@
 #include "Game.h"
 #include "Helpers.h"
 
-Game::Game(int width, int height, std::mt19937& random) : state(width, height), game_over(false), pacman_controller(random)
+Game::Game(int width, int height, std::mt19937& random) : state(width, height), game_over(false)
 {
 	//
 }
 
-void Game::Initialize(std::mt19937& random, double density, int time_limit)
+void Game::Initialize(std::mt19937& random, double density, int time_remaining,
+	PacmanController::PacmanController* pacman_controller,
+	GhostController::GhostController* ghost_controller)
 {
-	this->initial_time_remaining = time_limit;
-	this->time_remaining = time_limit;
+	this->initial_time_remaining = time_remaining;
+	this->time_remaining = time_remaining;
 
-	// Setup ghost controllers
-	this->ghost_controllers.emplace_back(random);
-	this->ghost_controllers.emplace_back(random);
-	this->ghost_controllers.emplace_back(random);
+	this->pacman_controller = pacman_controller;
+	this->ghost_controller = ghost_controller;
 
 	// Create random distributions
 	auto real_random = [&]()
@@ -61,17 +61,17 @@ void Game::Step()
 	state.UpdateDistances();
 
 	// Have controllers decide their actions
-	PacmanController::PacmanAction pacman_action = pacman_controller.Decide(state);
+	PacmanController::PacmanAction pacman_action = pacman_controller->Decide(state);
 	std::vector<GhostController::GhostAction> ghost_actions;
-	ghost_actions.reserve(ghost_controllers.size());
-	for (size_t i = 0; i < ghost_controllers.size(); ++i)
+	ghost_actions.reserve(state.ghosts.size());
+	for (size_t i = 0; i < state.ghosts.size(); ++i)
 	{
-		ghost_actions.emplace_back(ghost_controllers[i].Decide(state));
+		ghost_actions.emplace_back(ghost_controller->Decide(state));
 	}
 
 	// Move actors
 	state.MovePacman(PacmanController::deltas[pacman_action]);
-	for (size_t i = 0; i < ghost_controllers.size(); ++i)
+	for (size_t i = 0; i < state.ghosts.size(); ++i)
 	{
 		state.MoveGhost(i, GhostController::deltas[ghost_actions[i]]);
 

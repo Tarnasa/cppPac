@@ -16,6 +16,7 @@
 #include "Node.h"
 #include "TreePretty.h"
 #include "Initializers.h"
+#include "ParentSelection.h"
 
 int main(int argc, char** argv)
 {
@@ -80,6 +81,13 @@ int main(int argc, char** argv)
 		buffer_size += length_of_step * time_limit;
 		char* best_buffer = nullptr;
 
+		// Send parameters to individual
+		Individual::width = width;
+		Individual::height = height;
+		Individual::density = density;
+		Individual::time_limit = time_limit;
+		Individual::buffer_size = buffer_size;
+
 		// IOStreams are slow, just use c-style file io
 		FILE* world_file = fopen(world_filename_value.c_str(), "w");
 		FILE* score_file = fopen(score_filename_value.c_str(), "w");
@@ -111,48 +119,41 @@ int main(int argc, char** argv)
 		{
 			// Initialize the set of individuals
 			auto individuals = Initializers::RampedHalfAndHalf(random, 50, 5);
-			for (auto&& individual : individuals)
-			{
-				printf("%s\n", Brain::ToEquation(&(individual.pacman_controller.root)).c_str());
-			}
+			for (auto&& i : individuals)
+				i.evaluate(random);
 
-			int best_fitness = INT_MIN;
-
+			std::sort(individuals.begin(), individuals.end(), [&](Individual& a, Individual& b) { return a.GetFitness(random) > b.GetFitness(random); });
+			
 			printf("Run %i:\n", run + 1);
 			fprintf(score_file, "\nRun %i\n", run + 1);
 			for (int eval = 0; eval < evals_value; ++eval)
 			{
-				// Allocate enough memory to store an entire world file
-				char* buffer = nullptr;
-				try {
-					buffer = new char[buffer_size];
-				}
-				catch (std::bad_alloc)
+				auto parent_indices = ParentSelection::overselection(random, individuals, 20);
+
+				auto children = ParentSelection::generate_children(random, individuals, parent_indices);
+
+				for (auto&& i : children)
 				{
-					fprintf(stderr, "Unable to allocate %i chars for buffer.\n", buffer_size);
-					return 1;
+					std::cout << "Child: " << Brain::ToEquation(&i.pacman_controller.root) << "\n";
+					i.evaluate(random);
 				}
-				char* buffer_start = buffer;
 
-				// Initialize Game
-				Game game(width, height, random);
-				game.Initialize(random, density, time_limit);
-				int fitness = game.RunTillDone(buffer);
-
-				// Update best fitness
-				if (fitness > best_fitness)
+				if (chance(random, 0.05)) // TODO: config
 				{
-					best_fitness = fitness;
-
-					delete[] best_buffer;
-					best_buffer = buffer_start;
-
-					fprintf(score_file, "%i\t%i\n", eval + 1, best_fitness);
+					for (auto&& child : children)
+					{
+						Brain::mutate(random, &child.pacman_controller.root);
+					}
 				}
-				else
-				{
-					delete[] buffer_start;
-				}
+				// Sort children
+				std::sort(children.begin(), children.end(), [&](const Individual& a, const Individual& b) { return a.GetFitness(random) > b.GetFitness(random); });
+
+				individuals.reserve(individuals.size() + children.size());
+				std::move(std::begin(children), std::end(children), std::back_inserter(individuals));
+				std::inplace_merge(std::begin(individuals), std::begin(individuals) + 50, std::end(individuals), [&](const Individual& a, const Individual& b) { return a.GetFitness(random) > b.GetFitness(random); });
+				children.clear();
+
+				ParentSelection::truncate(individuals, 50);
 			}
 		}
 

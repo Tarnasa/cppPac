@@ -18,7 +18,7 @@ namespace Brain
 		b->children[child_b] = temp;
 	}
 
-	Node* createCopy(Node* root)
+	Node* createCopy(const Node* root)
 	{
 		Node* copy = root->Clone();
 		for (int i = 0; i < copy->children.size(); ++i)

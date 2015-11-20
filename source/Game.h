@@ -19,12 +19,14 @@ public:
 	int initial_time_remaining;
 	int time_remaining;
 	int dots_placed;
-	PacmanController::PacmanController pacman_controller;
-	std::vector<GhostController::GhostController> ghost_controllers;
+	PacmanController::PacmanController* pacman_controller;
+	GhostController::GhostController* ghost_controller;
 
 	Game(int width, int height, std::mt19937& random);
 	
-	void Initialize(std::mt19937& random, double density, int time_remaining);
+	void Initialize(std::mt19937& random, double density, int time_remaining,
+		PacmanController::PacmanController* pacman_controller,
+		GhostController::GhostController* ghost_controller);
 
 	void Step();
 	int RunTillDone(char* world_buffer);

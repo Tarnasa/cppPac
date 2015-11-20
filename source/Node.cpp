@@ -47,6 +47,10 @@ namespace Brain
 			min = right;
 			max = left;
 		}
+		// uniform_real can't handle special float cases
+		if (min == -std::numeric_limits<double>::infinity()) return min;
+		if (max == std::numeric_limits<double>::infinity()) return max;
+		//if (left == std::numeric_limits<double>::quiet_NaN() || right == std::numeric_limits<double>::quiet_NaN()) return 0.0; // lol
 		return std::uniform_real_distribution<double>(min, max)(random);
 	}
 

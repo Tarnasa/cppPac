@@ -8,7 +8,7 @@ namespace Brain
 {
 	void swapRandomChildren(std::mt19937& random, Node* a, Node* b);
 
-	Node* createCopy(Node* root);
+	Node* createCopy(const Node* root);
 
 	void replaceOneNode(std::mt19937& random, Node*& node); // Replaces one random node in the subtree
 	void replace(std::mt19937& random, Node*& node); // Replaces node with a new tree of equal height
