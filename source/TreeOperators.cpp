@@ -96,7 +96,7 @@ namespace Brain
 
 	void mutate(std::mt19937& random, BufferNode* root) // Applies either replace one node or grow
 	{
-		if (chance(random, 1.0))
+		if (chance(random, 0.5))
 		{
 			replaceOneNode(random, root->children[0]);
 		}

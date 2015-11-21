@@ -16,8 +16,6 @@ public:
 	GhostController::GhostController ghost_controller;
 	bool valid_fitness;
 	std::unique_ptr<char> buffer;
-
-private:
 	int fitness;
 	
 public:
@@ -37,9 +35,5 @@ public:
 
 	double GetFitness(std::mt19937& random) const;
 
-	/*friend void swap(Individual& left, Individual& right)
-	{
-		using std::swap;
-
-	}*/
+	void StealBuffer(Individual& rhs);
 };

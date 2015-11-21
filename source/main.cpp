@@ -29,45 +29,61 @@ int main(int argc, char** argv)
 		TCLAP::CmdLine cmd("A genetic programming EA for co-evolving controllers for Ms. Pacman and ghosts.\n"
 			"Use @argfile to include arguments from argfile.", ' ', "0.1");
 
-		TCLAP::MultiArg<int> board_width("w", "width", "The width of the playing board.", false, "Integer");
-		TCLAP::MultiArg<int> board_height("g", "height", "The height of the playing board.", false, "Integer");
-		TCLAP::MultiArg<double> pill_density("p", "density", "The chance that a cell will contain a pill", false, "Decimal between 0 and 1");
-		//TCLAP::MultiArg<int> time_limit("t", "time", "The number of turns that Ms. Pacman has to eat all the dots.", false, 1000, "Integer");
+		TCLAP::MultiArg<int> arg_board_width("w", "width", "The width of the playing board.", false, "Integer");
+		TCLAP::MultiArg<int> arg_board_height("g", "height", "The height of the playing board.", false, "Integer");
+		TCLAP::MultiArg<double> arg_pill_density("p", "density", "The chance that a cell will contain a pill", false, "Decimal between 0 and 1");
 
-		TCLAP::MultiArg<int> random_seed("s", "seed", "A number to seed the random number generator with, or -1 to seed with current time.", false, "Integer");
-		TCLAP::MultiArg<int> runs("r", "runs", "The number of runs.", false, "Integer");
-		TCLAP::MultiArg<int> evals("e", "evals", "The maximum number of evaluations that each run can take.", false, "Integer");
+		TCLAP::MultiArg<int> arg_populate_size("z", "population", "The number of individuals kept after each generation", false, "Integer");
+		TCLAP::MultiArg<int> arg_children_size("l", "children", "The number of new individuals created during recombination", false, "Integer");
+		TCLAP::MultiArg<double> arg_mutation_chance("m", "mutation", "The chance that the children will be mutated", false, "Decimal between 0 and 1");
+		TCLAP::MultiArg<int> arg_initialization_height("v", "levels", "The maximum number of levels of the starting population", false, "Integer");
+		TCLAP::MultiArg<double> arg_parsimony_pressure("y", "parsimony", "f'(x) = f(x) + maximum_possible_fitness - parsimony_pressure * (# of nodes)", false, "Decimal");
 
-		TCLAP::MultiArg<std::string> world_filename("o", "worldfile", "Path to the world log file to be created.", false, "File path");
-		TCLAP::MultiArg<std::string> score_filename("c", "scorefile", "Path to score log file to be created.", false, "File path");
+		TCLAP::MultiArg<int> arg_random_seed("s", "seed", "A number to seed the random number generator with, or -1 to seed with current time.", false, "Integer");
+		TCLAP::MultiArg<int> arg_runs("r", "runs", "The number of runs.", false, "Integer");
+		TCLAP::MultiArg<int> arg_evals("e", "evals", "The maximum number of evaluations that each run can take.", false, "Integer");
+
+		TCLAP::MultiArg<std::string> arg_world_filename("o", "worldfile", "Path to the world log file to be created.", false, "File path");
+		TCLAP::MultiArg<std::string> arg_score_filename("c", "scorefile", "Path to score log file to be created.", false, "File path");
 		
-		cmd.add(board_width);
-		cmd.add(board_height);
-		cmd.add(pill_density);
-		//cmd.add(time_limit);
+		cmd.add(arg_board_width);
+		cmd.add(arg_board_height);
+		cmd.add(arg_pill_density);
 
-		cmd.add(random_seed);
-		cmd.add(runs);
-		cmd.add(evals);
+		cmd.add(arg_populate_size);
+		cmd.add(arg_children_size);
+		cmd.add(arg_mutation_chance);
+		cmd.add(arg_initialization_height);
+		cmd.add(arg_parsimony_pressure);
 
-		cmd.add(world_filename);
-		cmd.add(score_filename);
+		cmd.add(arg_random_seed);
+		cmd.add(arg_runs);
+		cmd.add(arg_evals);
+
+		cmd.add(arg_world_filename);
+		cmd.add(arg_score_filename);
 
 		// Parse command line arguments
 		cmd.parse(args);
 
 		// If an argument was specified multiple times, grab the last one (This allows easy overriding of a config file)
 		// If an argument was NOT specified, use a default value
-		int width = board_width.getValue().size() ? board_width.getValue().back() : 30;
-		int height = board_height.getValue().size() ? board_height.getValue().back() : 30;
-		double density = pill_density.getValue().size() ? pill_density.getValue().back() : 0.5;
+		int width = arg_board_width.getValue().size() ? arg_board_width.getValue().back() : 30;
+		int height = arg_board_height.getValue().size() ? arg_board_height.getValue().back() : 30;
+		double density = arg_pill_density.getValue().size() ? arg_pill_density.getValue().back() : 0.5;
 
-		int random_seed_value = random_seed.getValue().size() ? random_seed.getValue().back() : -1;
-		int runs_value = runs.getValue().size() ? runs.getValue().back() : 3;
-		int evals_value = evals.getValue().size() ? evals.getValue().back() : 2000;
+		int population_size = arg_populate_size.getValue().size() ? arg_populate_size.getValue().back() : 50;
+		int children_size = arg_children_size.getValue().size() ? arg_children_size.getValue().back() : 40;
+		double mutation_chance = arg_mutation_chance.getValue().size() ? arg_mutation_chance.getValue().back() : 0.05;
+		int initialization_height = arg_initialization_height.getValue().size() ? arg_initialization_height.getValue().back() : 5;
+		double parsimony_pressure = arg_parsimony_pressure.getValue().size() ? arg_parsimony_pressure.getValue().back() : 0.5;
+
+		int random_seed_value = arg_random_seed.getValue().size() ? arg_random_seed.getValue().back() : -1;
+		int runs_value = arg_runs.getValue().size() ? arg_runs.getValue().back() : 3;
+		int evals_value = arg_evals.getValue().size() ? arg_evals.getValue().back() : 2000;
 		
-		std::string world_filename_value = world_filename.getValue().size() ? world_filename.getValue().back() : "default.world";
-		std::string score_filename_value = score_filename.getValue().size() ? score_filename.getValue().back() : "default.score";
+		std::string world_filename_value = arg_world_filename.getValue().size() ? arg_world_filename.getValue().back() : "default.world";
+		std::string score_filename_value = arg_score_filename.getValue().size() ? arg_score_filename.getValue().back() : "default.score";
 
 		int time_limit = width * height * 2;
 		int seed = random_seed_value < 0 ? time(0) : random_seed_value;
@@ -79,7 +95,6 @@ int main(int argc, char** argv)
 		buffer_size += get_printf_length(128, "%i\n%i\n", width, height);
 		buffer_size += get_printf_length(128, "p %i %i\n", width, height) * (width * height);
 		buffer_size += length_of_step * time_limit;
-		char* best_buffer = nullptr;
 
 		// Send parameters to individual
 		Individual::width = width;
@@ -114,31 +129,42 @@ int main(int argc, char** argv)
 
 		GameState::InitializeNeighbors(width, height);
 
+		Individual best_individual(random);
+		best_individual.fitness = 0;
+		best_individual.valid_fitness = true;
+
 		// Run the EA!
 		for (int run = 0; run < runs_value; ++run)
 		{
+			Individual best_run_individual(random);
+			best_run_individual.fitness = 0;
+			best_run_individual.valid_fitness = true;
+
+			int evals = 0;
+
 			// Initialize the set of individuals
-			auto individuals = Initializers::RampedHalfAndHalf(random, 50, 5);
+			auto individuals = Initializers::RampedHalfAndHalf(random, population_size, initialization_height);
 			for (auto&& i : individuals)
 				i.evaluate(random);
+			evals += individuals.size();
 
 			std::sort(individuals.begin(), individuals.end(), [&](Individual& a, Individual& b) { return a.GetFitness(random) > b.GetFitness(random); });
 			
 			printf("Run %i:\n", run + 1);
 			fprintf(score_file, "\nRun %i\n", run + 1);
-			for (int eval = 0; eval < evals_value; ++eval)
+			while (evals < evals_value)
 			{
-				auto parent_indices = ParentSelection::overselection(random, individuals, 20);
+				auto parent_indices = ParentSelection::overselection(random, individuals, children_size);
 
 				auto children = ParentSelection::generate_children(random, individuals, parent_indices);
 
 				for (auto&& i : children)
 				{
-					std::cout << "Child: " << Brain::ToEquation(&i.pacman_controller.root) << "\n";
 					i.evaluate(random);
 				}
+				evals += children.size();
 
-				if (chance(random, 0.05)) // TODO: config
+				if (chance(random, mutation_chance))
 				{
 					for (auto&& child : children)
 					{
@@ -147,19 +173,28 @@ int main(int argc, char** argv)
 				}
 				// Sort children
 				std::sort(children.begin(), children.end(), [&](const Individual& a, const Individual& b) { return a.GetFitness(random) > b.GetFitness(random); });
+				if (children[0].GetFitness(random) > best_run_individual.GetFitness(random))
+				{
+					best_run_individual.StealBuffer(children[0]);
+				}
 
 				individuals.reserve(individuals.size() + children.size());
 				std::move(std::begin(children), std::end(children), std::back_inserter(individuals));
-				std::inplace_merge(std::begin(individuals), std::begin(individuals) + 50, std::end(individuals), [&](const Individual& a, const Individual& b) { return a.GetFitness(random) > b.GetFitness(random); });
+				std::inplace_merge(std::begin(individuals), std::begin(individuals) + population_size, std::end(individuals), [&](const Individual& a, const Individual& b) { return a.GetFitness(random) > b.GetFitness(random); });
 				children.clear();
 
-				ParentSelection::truncate(individuals, 50);
+				ParentSelection::truncate(individuals, population_size);
+			}
+
+			if (best_run_individual.GetFitness(random) > best_individual.GetFitness(random))
+			{
+				best_individual.StealBuffer(best_run_individual);
 			}
 		}
 
-		fprintf(world_file, "%s", best_buffer);
+		std::cout << Brain::ToEquation(&best_individual.pacman_controller.root) << "\n";
+		fprintf(world_file, "%s", best_individual.buffer.get());
 
-		delete[] best_buffer;
 		puts("Done!\n");
 	}
 	catch (TCLAP::ArgException &e)

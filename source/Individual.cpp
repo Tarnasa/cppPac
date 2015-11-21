@@ -22,3 +22,12 @@ double Individual::GetFitness(std::mt19937& random) const
 {
 	return fitness;
 }
+
+void Individual::StealBuffer(Individual& rhs)
+{
+	pacman_controller = rhs.pacman_controller;
+	// TODO: Ghost controller
+	buffer.reset(rhs.buffer.release());
+	fitness = rhs.fitness;
+	valid_fitness = rhs.valid_fitness;
+}

@@ -64,6 +64,13 @@ namespace PacmanController
 		{
 			root.children.emplace_back(Brain::createCopy(rhs.root.children[0]));
 		}
+		PacmanController& operator=(const PacmanController& rhs)
+		{
+			if (root.children.size() != 0) delete root.children[0];
+			if (root.children.size() == 0) root.children.emplace_back(nullptr);
+			root.children[0] = Brain::createCopy(rhs.root.children[0]);
+			return *this;
+		}
 
 		PacmanController(PacmanController&& rhs)
 		{
