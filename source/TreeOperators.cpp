@@ -75,7 +75,7 @@ namespace Brain
 
 	void replace(std::mt19937& random, Node*& node) // Replaces node with a new tree of equal height
 	{
-		int height = getHeight(node);
+		int height = count_levels(node);
 		delete node;
 		node = generateTree(random, height);
 	}

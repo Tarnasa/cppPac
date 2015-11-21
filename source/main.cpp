@@ -38,6 +38,7 @@ int main(int argc, char** argv)
 		TCLAP::MultiArg<double> arg_mutation_chance("m", "mutation", "The chance that the children will be mutated", false, "Decimal between 0 and 1");
 		TCLAP::MultiArg<int> arg_initialization_height("v", "levels", "The maximum number of levels of the starting population", false, "Integer");
 		TCLAP::MultiArg<double> arg_parsimony_pressure("y", "parsimony", "f'(x) = f(x) + maximum_possible_fitness - parsimony_pressure * (# of nodes)", false, "Decimal");
+		TCLAP::MultiArg<int> arg_maximum_stale_generations("t", "converge", "The number of non-improving best fitness generations before the run is terminated (-1 to not use)", false, "Integer");
 
 		TCLAP::MultiArg<int> arg_random_seed("s", "seed", "A number to seed the random number generator with, or -1 to seed with current time.", false, "Integer");
 		TCLAP::MultiArg<int> arg_runs("r", "runs", "The number of runs.", false, "Integer");
@@ -45,6 +46,7 @@ int main(int argc, char** argv)
 
 		TCLAP::MultiArg<std::string> arg_world_filename("o", "worldfile", "Path to the world log file to be created.", false, "File path");
 		TCLAP::MultiArg<std::string> arg_score_filename("c", "scorefile", "Path to score log file to be created.", false, "File path");
+		TCLAP::MultiArg<std::string> arg_solution_filename("u", "solutionfile", "Path to solution file to be created.", false, "File path");
 		
 		cmd.add(arg_board_width);
 		cmd.add(arg_board_height);
@@ -62,6 +64,7 @@ int main(int argc, char** argv)
 
 		cmd.add(arg_world_filename);
 		cmd.add(arg_score_filename);
+		cmd.add(arg_solution_filename);
 
 		// Parse command line arguments
 		cmd.parse(args);
@@ -77,16 +80,21 @@ int main(int argc, char** argv)
 		double mutation_chance = arg_mutation_chance.getValue().size() ? arg_mutation_chance.getValue().back() : 0.05;
 		int initialization_height = arg_initialization_height.getValue().size() ? arg_initialization_height.getValue().back() : 5;
 		double parsimony_pressure = arg_parsimony_pressure.getValue().size() ? arg_parsimony_pressure.getValue().back() : 0.5;
-
+		int maximum_stale_generations = arg_maximum_stale_generations.getValue().size() ? arg_maximum_stale_generations.getValue().back() : -1;
+		
 		int random_seed_value = arg_random_seed.getValue().size() ? arg_random_seed.getValue().back() : -1;
 		int runs_value = arg_runs.getValue().size() ? arg_runs.getValue().back() : 3;
 		int evals_value = arg_evals.getValue().size() ? arg_evals.getValue().back() : 2000;
 		
 		std::string world_filename_value = arg_world_filename.getValue().size() ? arg_world_filename.getValue().back() : "default.world";
 		std::string score_filename_value = arg_score_filename.getValue().size() ? arg_score_filename.getValue().back() : "default.score";
+		std::string solution_filename_value = arg_solution_filename.getValue().size() ? arg_solution_filename.getValue().back() : "default.solution";
 
+		// More config logic
 		int time_limit = width * height * 2;
 		int seed = random_seed_value < 0 ? time(0) : random_seed_value;
+		// Treat negative as no convergence termination criteria
+		if (maximum_stale_generations <= 0) maximum_stale_generations = std::numeric_limits<int>::max();
 		std::mt19937 random(seed);
 
 		// Calculate maximum length of buffer needed to store log file for a single eval
@@ -102,10 +110,12 @@ int main(int argc, char** argv)
 		Individual::density = density;
 		Individual::time_limit = time_limit;
 		Individual::buffer_size = buffer_size;
+		Individual::parsimony_pressure = parsimony_pressure;
 
 		// IOStreams are slow, just use c-style file io
 		FILE* world_file = fopen(world_filename_value.c_str(), "w");
 		FILE* score_file = fopen(score_filename_value.c_str(), "w");
+		FILE* solution_file = fopen(solution_filename_value.c_str(), "w");
 
 		// Record and print out configuration options
 		fprintf(score_file, "Board width: %i\n"
@@ -136,11 +146,14 @@ int main(int argc, char** argv)
 		// Run the EA!
 		for (int run = 0; run < runs_value; ++run)
 		{
+			// Keep track of best individual for the run
 			Individual best_run_individual(random);
 			best_run_individual.fitness = 0;
 			best_run_individual.valid_fitness = true;
 
+			// Termination checkers
 			int evals = 0;
+			int generations_since_improvement = 0;
 
 			// Initialize the set of individuals
 			auto individuals = Initializers::RampedHalfAndHalf(random, population_size, initialization_height);
@@ -152,9 +165,9 @@ int main(int argc, char** argv)
 			
 			printf("Run %i:\n", run + 1);
 			fprintf(score_file, "\nRun %i\n", run + 1);
-			while (evals < evals_value)
+			while (evals < evals_value && generations_since_improvement < maximum_stale_generations)
 			{
-				auto parent_indices = ParentSelection::overselection(random, individuals, children_size);
+				auto parent_indices = ParentSelection::overselection(random, individuals, children_size / 2);
 
 				auto children = ParentSelection::generate_children(random, individuals, parent_indices);
 
@@ -176,6 +189,12 @@ int main(int argc, char** argv)
 				if (children[0].GetFitness(random) > best_run_individual.GetFitness(random))
 				{
 					best_run_individual.StealBuffer(children[0]);
+					generations_since_improvement = 0;
+					fprintf(score_file, "%i\t%f\t%i\n", evals, average(individuals, [&](const Individual& i) {return i.game_fitness; }), best_run_individual.game_fitness);
+				}
+				else
+				{
+					generations_since_improvement += 1;
 				}
 
 				individuals.reserve(individuals.size() + children.size());
@@ -183,17 +202,22 @@ int main(int argc, char** argv)
 				std::inplace_merge(std::begin(individuals), std::begin(individuals) + population_size, std::end(individuals), [&](const Individual& a, const Individual& b) { return a.GetFitness(random) > b.GetFitness(random); });
 				children.clear();
 
-				ParentSelection::truncate(individuals, population_size);
-			}
+				ParentSelection::kTournament(random, individuals, population_size, 5);
+			} // Finished with run
 
 			if (best_run_individual.GetFitness(random) > best_individual.GetFitness(random))
 			{
 				best_individual.StealBuffer(best_run_individual);
 			}
-		}
+		} // Finished with EA
+
+		fclose(score_file);
+		fprintf(world_file, "%s", best_individual.buffer.get());
+		fclose(world_file);
+		fprintf(solution_file, "%i : %s\n", best_individual.game_fitness, Brain::ToEquation(&best_individual.pacman_controller.root).c_str());
+		fclose(solution_file);
 
 		std::cout << Brain::ToEquation(&best_individual.pacman_controller.root) << "\n";
-		fprintf(world_file, "%s", best_individual.buffer.get());
 
 		puts("Done!\n");
 	}

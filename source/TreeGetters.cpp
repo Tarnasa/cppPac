@@ -65,18 +65,29 @@ namespace Brain
 		return nodes[std::uniform_int_distribution<int>(0, nodes.size() - 1)(random)];
 	}
 
-	int getHeight(Node* node)
+	int count_levels(Node* node)
 	{
 		if (node == nullptr) return 0;
 		int height = 1;
 		for (Node* child : node->children)
 		{
-			int child_height = getHeight(child) + 1;
+			int child_height = count_levels(child) + 1;
 			if (child_height > height)
 			{
 				height = child_height;
 			}
 		}
 		return height;
+	}
+
+	int count_nodes(Node* node)
+	{
+		if (node == nullptr) return 0;
+		int nodes = 1;
+		for (Node* child : node->children)
+		{
+			nodes += count_nodes(child);
+		}
+		return nodes;
 	}
 }

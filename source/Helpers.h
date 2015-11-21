@@ -50,3 +50,14 @@ int random_int(std::mt19937& random, int min, int max);
 bool chance(std::mt19937& random, double chance);
 
 std::string replace(const std::string& s, const std::string& search, const std::string& replacement);
+
+template<class ElementType, class PredicateType>
+double average(const std::vector<ElementType>& list, const PredicateType& predicate)
+{
+	double sum = 0;
+	for (auto&& e : list)
+	{
+		sum += predicate(e);
+	}
+	return sum / list.size();
+}

@@ -10,12 +10,13 @@ class Individual
 {
 public:
 	static int width, height, time_limit, buffer_size;
-	static double density;
+	static double density, parsimony_pressure;
 
 	PacmanController::PacmanController pacman_controller;
 	GhostController::GhostController ghost_controller;
 	bool valid_fitness;
 	std::unique_ptr<char> buffer;
+	int game_fitness;
 	int fitness;
 	
 public:

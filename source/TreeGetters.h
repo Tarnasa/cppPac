@@ -15,5 +15,6 @@ namespace Brain
 
 	Node* getRandomNonLeaf(std::mt19937& random, Node* root);
 
-	int getHeight(Node* node);
+	int count_levels(Node* node);
+	int count_nodes(Node* node);
 }

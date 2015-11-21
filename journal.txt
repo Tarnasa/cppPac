@@ -23,17 +23,21 @@ Select parents
 	Over-selection
 Create Children
 Mutate children?
+Make lots of constants configurable
 Survive
 	Truncation
-TODO:
 	kTournament w/o replacement
 Count evals
 Check for termination
 Bloat control
 Solution file
+Average and best fitness
+TODO:
 Plots
-Make lots of constants configurable
 Make sure initial not identical
 Rename things
+print parameters
+
+multiple game runs for one eval
 
 Walls!
