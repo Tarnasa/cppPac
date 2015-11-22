@@ -113,6 +113,8 @@ int main(int argc, char** argv)
 		Individual::buffer_size = buffer_size;
 		Individual::parsimony_pressure = parsimony_pressure;
 
+		GameState::InitializeNeighbors(width, height);
+
 		// IOStreams are slow, just use c-style file io
 		FILE* world_file = fopen(world_filename_value.c_str(), "w");
 		FILE* score_file = fopen(score_filename_value.c_str(), "w");
@@ -122,23 +124,35 @@ int main(int argc, char** argv)
 		fprintf(score_file, "Board width: %i\n"
 			"Board height: %i\n"
 			"Pill Density: %f\n"
+			"Population Size: %i\n"
+			"Children Size: %i\n"
+			"Mutation Chance: %f\n"
+			"Initialization Height: %i\n"
+			"Parsimony Pressure: %f\n"
 			"Random seed: %i\n"
 			"Runs: %i\n"
 			"Evals: %i\n"
 			"World file: %s\n"
-			"Score file: %s\n\nResult Log\n", width, height, density, seed, runs_value, evals_value,
-			world_filename_value.c_str(), score_filename_value.c_str());
+			"Score file: %s\n"
+			"Solution file: %s\n\nResult Log\n", width, height, density, population_size, children_size, mutation_chance,
+			initialization_height, parsimony_pressure, seed, runs_value, evals_value, world_filename_value.c_str(),
+			score_filename_value.c_str(), solution_filename_value.c_str());
 		printf("Board width: %i\n"
 			"Board height: %i\n"
 			"Pill Density: %f\n"
+			"Population Size: %i\n"
+			"Children Size: %i\n"
+			"Mutation Chance: %f\n"
+			"Initialization Height: %i\n"
+			"Parsimony Pressure: %f\n"
 			"Random seed: %i\n"
 			"Runs: %i\n"
 			"Evals: %i\n"
 			"World file: %s\n"
-			"Score file: %s\n", width, height, density, seed, runs_value, evals_value,
-			world_filename_value.c_str(), score_filename_value.c_str());
-
-		GameState::InitializeNeighbors(width, height);
+			"Score file: %s\n"
+			"Solution file: %s\n\nResult Log\n", width, height, density, population_size, children_size, mutation_chance,
+			initialization_height, parsimony_pressure, seed, runs_value, evals_value, world_filename_value.c_str(),
+			score_filename_value.c_str(), solution_filename_value.c_str());
 
 		Individual best_individual(random);
 		best_individual.fitness = 0;

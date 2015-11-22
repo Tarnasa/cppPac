@@ -65,14 +65,14 @@ namespace Brain
 
 	Node* generate_terminal_node(std::mt19937& random)
 	{
-		switch (random_int(random, 0, 5))
+		switch (random_int(random, 0, 3))
 		{
 		case 0: return createNodeFromInt(random, Constant); break;
 		case 1: return createNodeFromInt(random, PacmanToDot); break;
 		case 2: return createNodeFromInt(random, PacmanToGhost); break;
 		case 3: return createNodeFromInt(random, PacmanDotsEaten); break;
-		case 4: return createNodeFromInt(random, PacmanX); break;
-		case 5: return createNodeFromInt(random, PacmanY); break;
+		//case 4: return createNodeFromInt(random, PacmanX); break;
+		//case 5: return createNodeFromInt(random, PacmanY); break;
 		}
 	}
 

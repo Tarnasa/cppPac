@@ -32,10 +32,10 @@ Check for termination
 Bloat control
 Solution file
 Average and best fitness
-TODO:
-Plots
 Rename things
 print parameters
+TODO:
+Plots
 
 multiple game runs for one eval
 
