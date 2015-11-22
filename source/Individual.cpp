@@ -23,12 +23,7 @@ void Individual::evaluate(std::mt19937& random)
 	}
 }
 
-double Individual::GetFitness(std::mt19937& random) const
-{
-	return fitness;
-}
-
-void Individual::StealBuffer(Individual& rhs)
+void Individual::steal_buffer(Individual& rhs)
 {
 	pacman_controller = rhs.pacman_controller;
 	// TODO: Ghost controller

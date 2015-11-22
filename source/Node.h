@@ -35,10 +35,26 @@ namespace Brain
 		PacmanToDot,
 		PacmanToGhost,
 		PacmanDotsEaten,
+		PacmanX,
+		PacmanY,
 		NUMBER_OF_NODE_TYPES
 	};
 
 	Node* createNodeFromInt(std::mt19937& random, int index);
+
+	class TerminalNode : public Node
+	{
+	public:
+		virtual int GetMinChildren() const { return 0; }
+		virtual int GetMaxChildren() const { return 0; }
+	};
+
+	class BinaryNode : public Node
+	{
+	public:
+		virtual int GetMinChildren() const { return 2; }
+		virtual int GetMaxChildren() const { return 2; }
+	};
 
 	class BufferNode : public Node // Special node for the root node in a tree
 	{
@@ -50,7 +66,7 @@ namespace Brain
 		virtual int GetMaxChildren() const { return 1; }
 	};
 
-	class RandomNode : public Node
+	class RandomNode : public TerminalNode
 	{
 	public:
 		std::function<double()> real_random;
@@ -59,10 +75,9 @@ namespace Brain
 		virtual double Forward(const GameState& state);
 		virtual Node* Clone() const { return new RandomNode(*this); }
 		virtual char GetChar() const { return 'r'; }
-		virtual int GetMaxChildren() const { return 0; }
 	};
 
-	class RandomRangeNode : public Node
+	class RandomRangeNode : public BinaryNode
 	{
 	public:
 		std::mt19937& random;
@@ -71,11 +86,9 @@ namespace Brain
 		virtual double Forward(const GameState& state);
 		virtual Node* Clone() const { return new RandomRangeNode(*this); }
 		virtual char GetChar() const { return 'R'; }
-		virtual int GetMinChildren() const { return 2; }
-		virtual int GetMaxChildren() const { return 2; }
 	};
 
-	class ConstantNode : public Node
+	class ConstantNode : public TerminalNode
 	{
 	public:
 		const double constant;
@@ -84,10 +97,9 @@ namespace Brain
 		double Forward(const GameState& state);
 		virtual Node* Clone() const { return new ConstantNode(*this); }
 		virtual char GetChar() const { return 'c'; }
-		virtual int GetMaxChildren() const { return 0; }
 	};
 
-	class SumNode : public Node
+	class SumNode : public BinaryNode
 	{
 	public:
 		SumNode() {};
@@ -95,11 +107,9 @@ namespace Brain
 		double Forward(const GameState& state);
 		virtual Node* Clone() const { return new SumNode(*this); }
 		virtual char GetChar() const { return '+'; }
-		virtual int GetMinChildren() const { return 2; }
-		virtual int GetMaxChildren() const { return 2; }
 	};
 
-	class SubtractNode : public Node
+	class SubtractNode : public BinaryNode
 	{
 	public:
 		SubtractNode() {};
@@ -107,11 +117,9 @@ namespace Brain
 		double Forward(const GameState& state);
 		virtual Node* Clone() const { return new SubtractNode(*this); }
 		virtual char GetChar() const { return '-'; }
-		virtual int GetMinChildren() const { return 2; }
-		virtual int GetMaxChildren() const { return 2; }
 	};
 
-	class ProductNode : public Node
+	class ProductNode : public BinaryNode
 	{
 	public:
 		ProductNode() {};
@@ -119,11 +127,9 @@ namespace Brain
 		double Forward(const GameState& state);
 		virtual Node* Clone() const { return new ProductNode(*this); }
 		virtual char GetChar() const { return '*'; }
-		virtual int GetMinChildren() const { return 2; }
-		virtual int GetMaxChildren() const { return 2; }
 	};
 
-	class DivideNode : public Node
+	class DivideNode : public BinaryNode
 	{
 	public:
 		DivideNode () {};
@@ -131,11 +137,9 @@ namespace Brain
 		double Forward(const GameState& state);
 		virtual Node* Clone() const { return new DivideNode(*this); }
 		virtual char GetChar() const { return '/'; }
-		virtual int GetMinChildren() const { return 2; }
-		virtual int GetMaxChildren() const { return 2; }
 	};
 
-	class PacmanToDotNode : public Node // Returns the distance from Pacman to the nearest dot
+	class PacmanToDotNode : public TerminalNode
 	{
 	public:
 		PacmanToDotNode() {};
@@ -143,10 +147,9 @@ namespace Brain
 		double Forward(const GameState& state) { return state.pacman.distance_to_dot; }
 		virtual Node* Clone() const { return new PacmanToDotNode(*this); }
 		virtual char GetChar() const { return 'D'; }
-		virtual int GetMaxChildren() const { return 0; }
 	};
 
-	class PacmanToGhostNode : public Node // Returns the distance from Pacman to the nearest ghost
+	class PacmanToGhostNode : public TerminalNode
 	{
 	public:
 		PacmanToGhostNode() {};
@@ -154,10 +157,9 @@ namespace Brain
 		double Forward(const GameState& state) { return state.pacman.distance_to_ghost; }
 		virtual Node* Clone() const { return new PacmanToGhostNode(*this); }
 		virtual char GetChar() const { return 'G'; }
-		virtual int GetMaxChildren() const { return 0; }
 	};
 
-	class PacmanDotsEatenNode : public Node
+	class PacmanDotsEatenNode : public TerminalNode
 	{
 	public:
 		PacmanDotsEatenNode() {};
@@ -165,6 +167,25 @@ namespace Brain
 		double Forward(const GameState& state) { return state.pacman.dots_eaten; }
 		virtual Node* Clone() const { return new PacmanDotsEatenNode(*this); }
 		virtual char GetChar() const { return 'E'; }
-		virtual int GetMaxChildren() const { return 0; }
+	};
+
+	class PacmanXNode : public TerminalNode
+	{
+	public:
+		PacmanXNode() {};
+
+		double Forward(const GameState& state) { return state.pacman.position.x; }
+		virtual Node* Clone() const { return new PacmanXNode(*this); }
+		virtual char GetChar() const { return 'X'; }
+	};
+	
+	class PacmanYNode : public TerminalNode
+	{
+	public:
+		PacmanYNode() {};
+
+		double Forward(const GameState& state) { return state.pacman.position.y; }
+		virtual Node* Clone() const { return new PacmanYNode(*this); }
+		virtual char GetChar() const { return 'Y'; }
 	};
 }

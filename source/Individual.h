@@ -34,7 +34,5 @@ public:
 
 	void evaluate(std::mt19937& random);
 
-	double GetFitness(std::mt19937& random) const;
-
-	void StealBuffer(Individual& rhs);
+	void steal_buffer(Individual& rhs);
 };

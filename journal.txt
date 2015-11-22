@@ -34,10 +34,11 @@ Solution file
 Average and best fitness
 TODO:
 Plots
-Make sure initial not identical
 Rename things
 print parameters
 
 multiple game runs for one eval
 
 Walls!
+
+Make sure initial not identical

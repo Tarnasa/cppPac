@@ -35,11 +35,11 @@ namespace PacmanController
 		{
 			if (full)
 			{
-				root.children.emplace_back(Brain::generateFullTree(random, max_levels));
+				root.children.emplace_back(Brain::generate_full_tree(random, max_levels));
 			}
 			else
 			{
-				root.children.emplace_back(Brain::generateTreeUpTo(random, max_levels));
+				root.children.emplace_back(Brain::generate_tree_up_to(random, max_levels));
 			}
 		}
 
@@ -62,13 +62,13 @@ namespace PacmanController
 
 		explicit PacmanController(const PacmanController& rhs)
 		{
-			root.children.emplace_back(Brain::createCopy(rhs.root.children[0]));
+			root.children.emplace_back(Brain::copy_tree(rhs.root.children[0]));
 		}
 		PacmanController& operator=(const PacmanController& rhs)
 		{
 			if (root.children.size() != 0) delete root.children[0];
 			if (root.children.size() == 0) root.children.emplace_back(nullptr);
-			root.children[0] = Brain::createCopy(rhs.root.children[0]);
+			root.children[0] = Brain::copy_tree(rhs.root.children[0]);
 			return *this;
 		}
 

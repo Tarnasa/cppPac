@@ -26,6 +26,8 @@ namespace Brain
 		case PacmanToDot: return new Brain::PacmanToDotNode(); break;
 		case PacmanToGhost: return new Brain::PacmanToGhostNode(); break;
 		case PacmanDotsEaten: return new Brain::PacmanDotsEatenNode(); break;
+		case PacmanX: return new Brain::PacmanXNode(); break;
+		case PacmanY: return new Brain::PacmanYNode(); break;
 		default: return nullptr; // lolwut
 		}
 	}

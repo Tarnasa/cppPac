@@ -65,7 +65,7 @@ namespace Brain
 	std::string Test2(std::mt19937& random)
 	{
 		BufferNode buffer;
-		buffer.children.emplace_back(generateTreeUpTo(random, 5));
+		buffer.children.emplace_back(generate_tree_up_to(random, 5));
 		return ToEquation(&buffer);
 	}
 }

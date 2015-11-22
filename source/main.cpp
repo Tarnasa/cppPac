@@ -16,7 +16,8 @@
 #include "Node.h"
 #include "TreePretty.h"
 #include "Initializers.h"
-#include "ParentSelection.h"
+#include "Parenting.h"
+#include "Survival.h"
 
 int main(int argc, char** argv)
 {
@@ -79,7 +80,7 @@ int main(int argc, char** argv)
 		int children_size = arg_children_size.getValue().size() ? arg_children_size.getValue().back() : 40;
 		double mutation_chance = arg_mutation_chance.getValue().size() ? arg_mutation_chance.getValue().back() : 0.05;
 		int initialization_height = arg_initialization_height.getValue().size() ? arg_initialization_height.getValue().back() : 5;
-		double parsimony_pressure = arg_parsimony_pressure.getValue().size() ? arg_parsimony_pressure.getValue().back() : 0.5;
+		double parsimony_pressure = arg_parsimony_pressure.getValue().size() ? arg_parsimony_pressure.getValue().back() : 0.15;
 		int maximum_stale_generations = arg_maximum_stale_generations.getValue().size() ? arg_maximum_stale_generations.getValue().back() : -1;
 		
 		int random_seed_value = arg_random_seed.getValue().size() ? arg_random_seed.getValue().back() : -1;
@@ -161,15 +162,15 @@ int main(int argc, char** argv)
 				i.evaluate(random);
 			evals += individuals.size();
 
-			std::sort(individuals.begin(), individuals.end(), [&](Individual& a, Individual& b) { return a.GetFitness(random) > b.GetFitness(random); });
+			std::sort(individuals.begin(), individuals.end(), [&](Individual& a, Individual& b) { return a.fitness > b.fitness; });
 			
 			printf("Run %i:\n", run + 1);
 			fprintf(score_file, "\nRun %i\n", run + 1);
 			while (evals < evals_value && generations_since_improvement < maximum_stale_generations)
 			{
-				auto parent_indices = ParentSelection::overselection(random, individuals, children_size / 2);
+				auto parent_indices = Parenting::overselection(random, individuals, children_size / 2);
 
-				auto children = ParentSelection::generate_children(random, individuals, parent_indices);
+				auto children = Parenting::generate_children(random, individuals, parent_indices);
 
 				for (auto&& i : children)
 				{
@@ -185,10 +186,10 @@ int main(int argc, char** argv)
 					}
 				}
 				// Sort children
-				std::sort(children.begin(), children.end(), [&](const Individual& a, const Individual& b) { return a.GetFitness(random) > b.GetFitness(random); });
-				if (children[0].GetFitness(random) > best_run_individual.GetFitness(random))
+				std::sort(children.begin(), children.end(), [&](const Individual& a, const Individual& b) { return a.fitness > b.fitness; });
+				if (children[0].fitness > best_run_individual.fitness)
 				{
-					best_run_individual.StealBuffer(children[0]);
+					best_run_individual.steal_buffer(children[0]);
 					generations_since_improvement = 0;
 					fprintf(score_file, "%i\t%f\t%i\n", evals, average(individuals, [&](const Individual& i) {return i.game_fitness; }), best_run_individual.game_fitness);
 				}
@@ -199,15 +200,15 @@ int main(int argc, char** argv)
 
 				individuals.reserve(individuals.size() + children.size());
 				std::move(std::begin(children), std::end(children), std::back_inserter(individuals));
-				std::inplace_merge(std::begin(individuals), std::begin(individuals) + population_size, std::end(individuals), [&](const Individual& a, const Individual& b) { return a.GetFitness(random) > b.GetFitness(random); });
+				std::inplace_merge(std::begin(individuals), std::begin(individuals) + population_size, std::end(individuals), [&](const Individual& a, const Individual& b) { return a.fitness > b.fitness; });
 				children.clear();
 
-				ParentSelection::kTournament(random, individuals, population_size, 5);
+				Survival::kTournament(random, individuals, population_size, 5);
 			} // Finished with run
 
-			if (best_run_individual.GetFitness(random) > best_individual.GetFitness(random))
+			if (best_run_individual.fitness > best_individual.fitness)
 			{
-				best_individual.StealBuffer(best_run_individual);
+				best_individual.steal_buffer(best_run_individual);
 			}
 		} // Finished with EA
 
