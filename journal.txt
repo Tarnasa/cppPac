@@ -34,11 +34,14 @@ Solution file
 Average and best fitness
 Rename things
 print parameters
-TODO:
 Plots
-
-multiple game runs for one eval
+TODO:
+PDF
+Test on school computers
 
 Walls!
 
+multiple game runs for one eval
+
+s-exp printer and loader
 Make sure initial not identical

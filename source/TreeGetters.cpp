@@ -80,7 +80,7 @@ namespace Brain
 		if (a == nullptr || b == nullptr) return false;
 		if (a->GetChar() != b->GetChar()) return false;
 		if (a->children.size() != b->children.size()) return false;
-		for (int i = 0; i < a->children.size(); ++i)
+		for (size_t i = 0; i < a->children.size(); ++i)
 		{
 			if (!equal(a->children[i], b->children[i])) return false;
 		}

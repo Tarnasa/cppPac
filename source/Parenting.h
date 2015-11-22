@@ -43,7 +43,7 @@ namespace Parenting
 			partition_percentage = 0.16;
 		else if (individuals.size() < 4000)
 			partition_percentage = 0.08;
-		int partition_index = partition_percentage * individuals.size();
+		int partition_index = static_cast<int>(partition_percentage * individuals.size());
 		for (int c = 0; c < number_to_select; ++c)
 		{
 			std::vector<int> pair;

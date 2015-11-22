@@ -38,7 +38,7 @@ std::string replace(const std::string& s, const std::string& search, const std::
 	std::string n;
 	int match_start = 0;
 	int match_length = 0;
-	for (int i = 0; i < s.size(); ++i)
+	for (size_t i = 0; i < s.size(); ++i)
 	{
 		if (s[i] == search[match_length])
 		{

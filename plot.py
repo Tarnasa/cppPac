@@ -25,6 +25,8 @@ parser.add_argument('--title', '-t', dest='title', default=None, type=str, requi
                     help='The title to display at the top of the plot.  FILENAME is replaced by input filename.  '
                     'HORIZONTAL is replaced by horizontal axis label.  VERTICAL is replaced by vertical axis label.'
                     'Defaults to the name of the input file.')
+parser.add_argument('--datasets', '-d', dest='labels', default='', required=False,
+                    help='A comma-delimited list of labels for use in a legend if multiple datasets are used')
 
 args = parser.parse_args()
 
@@ -46,13 +48,58 @@ average_values = list()
 best_values = list()
 for run_index, run in enumerate(runs[1:]):
     for line_index, line in enumerate(itertools.ifilter(None, re.split(r'\r?\n', run))):
-        evals, best = re.match(r'([0-9]+)\t([0-9.]+)', line).groups()
+        evals, average, best = re.match(r'([0-9]+)\t([0-9.]+)\t([0-9.]+)', line).groups()
         evals = int(evals)
+        average = float(average)
         best = float(best)
         if run_index == 0:
             evals_values.append(evals)
+            average_values.append((list()))
             best_values.append(list())
+        average_values[line_index].append(average)
         best_values[line_index].append(best)
+
+
+def plot_two_box_and_average(averages, bests, average_color, best_color, average_line_format, best_line_format):
+    figure = matplotlib.pyplot.figure()
+    big = figure.add_subplot(1, 1, 1)
+
+    box_step_size = len(average_values) / 10
+    box_width = evals_values[-1] / 17.0
+
+    def box_and_average_plot(values, color, line_format, label):
+        # Plot box plot
+        box = big.boxplot([x for x in values[::box_step_size]], positions=evals_values[::box_step_size],
+                          labels=[[str(x), ''][i % 2] for i, x in enumerate(evals_values[::box_step_size])],
+                          widths=box_width)
+        matplotlib.pyplot.setp(box['boxes'], color=color)
+        matplotlib.pyplot.setp(box['whiskers'], color=color)
+        matplotlib.pyplot.setp(box['medians'], color=color)
+        matplotlib.pyplot.setp(box['fliers'], color=color)
+
+        # Plot average of values line
+        return big.plot(evals_values, [sum(a) / float(len(a)) for a in values], line_format, label=label)
+
+    labels = args.labels.split(',') + [''] * (2 - len(args.labels.split(',')))
+    average_line, = box_and_average_plot(averages, average_color, average_line_format, labels[0])
+    best_line, = box_and_average_plot(bests, best_color, best_line_format, labels[1])
+
+    # Setup dimensions
+    big.set_xlim(0, evals_values[-1] * 1.05)
+    big.set_ylim(min(min(x for x in column) for column in averages) * 0.95,
+                 max(max(x for x in column) for column in bests) * 1.05)
+
+    matplotlib.pyplot.title(args.title)
+    matplotlib.pyplot.xlabel(args.x_axis)
+    matplotlib.pyplot.ylabel(args.y_axis)
+
+    if args.labels and len(args.labels.split(',')) == 2:
+        big.legend(handles=[average_line, best_line], labels=args.labels.split(','), loc='upper left')
+
+    if args.out:
+        figure.savefig(args.out)
+    else:
+        matplotlib.pyplot.show()
 
 
 def plot_separate_runs(values, line_format):
@@ -77,4 +124,4 @@ def plot_separate_runs(values, line_format):
     else:
         matplotlib.pyplot.show()
 
-plot_separate_runs(best_values, 'r--')
+plot_two_box_and_average(average_values, best_values, 'b', 'r', 'b-', 'r-')

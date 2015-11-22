@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 		int maximum_stale_generations = arg_maximum_stale_generations.getValue().size() ? arg_maximum_stale_generations.getValue().back() : -1;
 		
 		int random_seed_value = arg_random_seed.getValue().size() ? arg_random_seed.getValue().back() : -1;
-		int runs_value = arg_runs.getValue().size() ? arg_runs.getValue().back() : 3;
+		int runs_value = arg_runs.getValue().size() ? arg_runs.getValue().back() : 30;
 		int evals_value = arg_evals.getValue().size() ? arg_evals.getValue().back() : 2000;
 		
 		std::string world_filename_value = arg_world_filename.getValue().size() ? arg_world_filename.getValue().back() : "default.world";
@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 
 		// More config logic
 		int time_limit = width * height * 2;
-		int seed = random_seed_value < 0 ? time(0) : random_seed_value;
+		int seed = static_cast<int>(random_seed_value < 0 ? time(0) : random_seed_value);
 		// Treat negative as no convergence termination criteria
 		if (maximum_stale_generations <= 0) maximum_stale_generations = std::numeric_limits<int>::max();
 		std::mt19937 random(seed);
@@ -205,7 +205,6 @@ int main(int argc, char** argv)
 				{
 					best_run_individual.steal_buffer(children[0]);
 					generations_since_improvement = 0;
-					fprintf(score_file, "%i\t%f\t%i\n", evals, average(individuals, [&](const Individual& i) {return i.game_fitness; }), best_run_individual.game_fitness);
 				}
 				else
 				{
@@ -218,6 +217,8 @@ int main(int argc, char** argv)
 				children.clear();
 
 				Survival::kTournament(random, individuals, population_size, 5);
+
+				fprintf(score_file, "%i\t%f\t%i\n", evals, average(individuals, [&](const Individual& i) {return i.game_fitness; }), best_run_individual.game_fitness);
 			} // Finished with run
 
 			if (best_run_individual.fitness > best_individual.fitness)

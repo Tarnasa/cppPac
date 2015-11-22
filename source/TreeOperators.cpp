@@ -11,7 +11,7 @@ namespace Brain
 	Node* copy_tree(const Node* root)
 	{
 		Node* copy = root->Clone();
-		for (int i = 0; i < copy->children.size(); ++i)
+		for (size_t i = 0; i < copy->children.size(); ++i)
 		{
 			copy->children[i] = copy_tree(copy->children[i]);
 		}

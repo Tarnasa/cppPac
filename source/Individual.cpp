@@ -17,7 +17,7 @@ void Individual::evaluate(std::mt19937& random)
 		Game game(width, height, random);
 		game.Initialize(random, density, time_limit, &pacman_controller, &ghost_controller);
 		game_fitness = game.RunTillDone(buffer.get());
-		int penalty = parsimony_pressure * Brain::count_nodes(&pacman_controller.root);
+		int penalty = static_cast<int>(parsimony_pressure * Brain::count_nodes(&pacman_controller.root));
 		fitness = game_fitness + 200 - penalty;
 		valid_fitness = true;
 	}

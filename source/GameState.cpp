@@ -140,7 +140,7 @@ void GameState::StepLogEntry(char*& world_buffer) const
 {
 	// Write pacman and ghosts locations
 	world_buffer += sprintf(world_buffer, "m %i %i\n", pacman.position.x, pacman.position.y);
-	for (int ghost_index = 0; ghost_index < ghosts.size(); ++ghost_index)
+	for (size_t ghost_index = 0; ghost_index < ghosts.size(); ++ghost_index)
 	{
 		world_buffer += sprintf(world_buffer, "%i %i %i\n", ghost_index + 1, ghosts[ghost_index].position.x, ghosts[ghost_index].position.y);
 	}

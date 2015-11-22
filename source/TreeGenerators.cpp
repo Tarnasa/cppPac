@@ -74,6 +74,7 @@ namespace Brain
 		//case 4: return createNodeFromInt(random, PacmanX); break;
 		//case 5: return createNodeFromInt(random, PacmanY); break;
 		}
+		return nullptr;
 	}
 
 	Node* generate_parent_node(std::mt19937& random)
@@ -86,5 +87,6 @@ namespace Brain
 		case 3: return createNodeFromInt(random, Divide); break;
 		case 4: return createNodeFromInt(random, RandomRange); break;
 		}
+		return nullptr;
 	}
 }

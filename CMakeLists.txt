@@ -1,4 +1,10 @@
-cmake_minimum_required(VERSION 2.8.11)
+if(CMAKE_MAJOR_VERSION LESS 3)
+   cmake_minimum_required(VERSION 2.6.0 FATAL_ERROR)
+   set(CPP11_OKAY FALSE)
+elseif()
+   cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
+   set(CPP11_OKAY TRUE)
+endif()
 project( cppPac )
 
 # Put binaries in /bin/${CMAKE_BUILD_TYPE}
@@ -9,7 +15,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CMAKE_BUILD_TYPE_UPPER} ${CMAKE_BINARY_DIR}
 file(GLOB CPPPAC_SOURCES "source/*.cpp")
 
 # C++11
-set(CMAKE_CXX_STANDARD 11)
+if(CPP11_OKAY)
+	set(CMAKE_CXX_STANDARD 11)
+else()
+   if(UNIX OR MINGW)
+	  set(CMAKE_CXXFLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+   endif()
+endif()
 
 # executable file for the ea
 add_executable(cppPac ${CPPPAC_SOURCES})

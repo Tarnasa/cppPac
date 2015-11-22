@@ -14,7 +14,7 @@ namespace Survival
 
 	void kTournament(std::mt19937& random, std::vector<Individual>& individuals, int number_to_select, int tournament_size)
 	{
-		for (int partition_index = 0; partition_index < (individuals.size() - number_to_select); ++partition_index)
+		for (size_t partition_index = 0; partition_index < (individuals.size() - number_to_select); ++partition_index)
 		{
 			int dead_index = random_int(random, partition_index, individuals.size() - 1);
 			for (int i = 0; i < (tournament_size - 1); ++i)

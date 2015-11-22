@@ -35,11 +35,14 @@ To run the default configuration
 
 cppPac @config/default.cfg
 
-This will create default.score and default.world in the /output/ folder
-- default.score contains the a list <eval><tab><fitness> pairs for each run
-  along with the configuration parameters used to generate this file.
+This will create default.score, default.world, and default.solution in the
+    /output/ folder
+- default.score contains the a list
+    <eval><tab><average fitness><tab><best fitness> tuples for each run
+    along with the configuration parameters used to generate this file.
 - default.world contains a description of the world and actions taken by
-  Pacman and the ghosts.
+    Pacman and the ghosts.
+- default.solution contains the best solution found across all runs
 
 
 MORE HELP:
@@ -49,9 +52,7 @@ To get more information on how to use cppPac, run cppPac --help
 CONFIGURATIONS:
 A number of pre-made configuration files have been placed in /config/
 name       - width, height, density
-small.cfg  - 10, 10, 0.5
-medium.cfg - 30, 30, 0.2
-large.cfg  - 40, 50, 0.7
-huge.cfg   - 80, 80, 0.3
+small.cfg  - 10, 15, 0.5
+medium.cfg - 30, 30, 0.25
 The corresponding output files are located in /output/
 The corresponding graphs of these outputs are also located in /output/
