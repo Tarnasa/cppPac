@@ -38,6 +38,8 @@ namespace Brain
 		case 'D': ans += "pacman_to_dot"; break;
 		case 'G': ans += "pacman_to_ghost"; break;
 		case 'E': ans += "dots_eaten"; break;
+		case 'X': ans += "pacman_x"; break;
+		case 'Y': ans += "pacman_y"; break;
 		}
 		return ans;
 	}
