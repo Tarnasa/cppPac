@@ -34,14 +34,14 @@ namespace GhostController
 			return root.Forward(state);
 		}
 
-		GhostAction Decide(const GameState& state)
+		GhostAction Decide(int id, const GameState& state)
 		{
 			double best_fitness = std::numeric_limits<double>::min();
 			GhostAction best_action;
 			for (int i = 0; i < GHOST_ACTION_COUNT; ++i)
 			{
 				GameState new_state(state);
-				if (!new_state.MoveGhost(i, deltas[i])) continue;
+				if (!new_state.MoveGhost(id, deltas[i])) continue;
 				new_state.UpdateDistances();
 				double fitness = Evaluate(new_state);
 				if (fitness > best_fitness)

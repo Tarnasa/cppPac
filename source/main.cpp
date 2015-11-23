@@ -41,6 +41,10 @@ int main(int argc, char** argv)
 		TCLAP::MultiArg<double> arg_parsimony_pressure("y", "parsimony", "f'(x) = f(x) + maximum_possible_fitness - parsimony_pressure * (# of nodes)", false, "Decimal");
 		TCLAP::MultiArg<int> arg_maximum_stale_generations("t", "converge", "The number of non-improving best fitness generations before the run is terminated (-1 to not use)", false, "Integer");
 
+		TCLAP::MultiArg<std::string> arg_parent_selection("a", "parent", "The method used to select parents", false, "One of [fps, overselection]");
+		TCLAP::MultiArg<std::string> arg_survival_selection("i", "survival", "The method used to select survivors", false, "One of [truncation, ktourn]");
+		TCLAP::MultiArg<int> arg_tournament_size("k", "tournamentsize", "The tournament size if kTournament is used", false, "Integer");
+
 		TCLAP::MultiArg<int> arg_random_seed("s", "seed", "A number to seed the random number generator with, or -1 to seed with current time.", false, "Integer");
 		TCLAP::MultiArg<int> arg_runs("r", "runs", "The number of runs.", false, "Integer");
 		TCLAP::MultiArg<int> arg_evals("e", "evals", "The maximum number of evaluations that each run can take.", false, "Integer");
@@ -59,6 +63,10 @@ int main(int argc, char** argv)
 		cmd.add(arg_initialization_height);
 		cmd.add(arg_parsimony_pressure);
 		cmd.add(arg_maximum_stale_generations);
+
+		cmd.add(arg_parent_selection);
+		cmd.add(arg_survival_selection);
+		cmd.add(arg_tournament_size);
 
 		cmd.add(arg_random_seed);
 		cmd.add(arg_runs);
@@ -84,6 +92,10 @@ int main(int argc, char** argv)
 		double parsimony_pressure = arg_parsimony_pressure.getValue().size() ? arg_parsimony_pressure.getValue().back() : 0.15;
 		int maximum_stale_generations = arg_maximum_stale_generations.getValue().size() ? arg_maximum_stale_generations.getValue().back() : -1;
 		
+		std::string parent_selection = arg_parent_selection.getValue().size() ? arg_parent_selection.getValue().back() : "fps";
+		std::string survival_selection = arg_survival_selection.getValue().size() ? arg_survival_selection.getValue().back() : "truncation";
+		int tournament_size = arg_tournament_size.getValue().size() ? arg_tournament_size.getValue().back() : 5;
+
 		int random_seed_value = arg_random_seed.getValue().size() ? arg_random_seed.getValue().back() : -1;
 		int runs_value = arg_runs.getValue().size() ? arg_runs.getValue().back() : 30;
 		int evals_value = arg_evals.getValue().size() ? arg_evals.getValue().back() : 2000;
@@ -98,6 +110,10 @@ int main(int argc, char** argv)
 		// Treat negative as no convergence termination criteria
 		if (maximum_stale_generations <= 0) maximum_stale_generations = std::numeric_limits<int>::max();
 		std::mt19937 random(seed);
+		enum ParentSelector { FPS, OVERSELECTION } parent_selector = FPS;
+		enum SurvivalSelector { TRUNCATION, KTOURNAMENT } survival_selector = TRUNCATION;
+		if (parent_selection == "overselection") parent_selector = OVERSELECTION;
+		if (survival_selection == "ktourn") survival_selector = KTOURNAMENT;
 
 		// Calculate maximum length of buffer needed to store log file for a single eval
 		int length_of_step = get_printf_length(128, "m %i %i\n", width, height) * 4 + get_printf_length(128, "t %i %i\n", time_limit, width * height);
@@ -183,7 +199,11 @@ int main(int argc, char** argv)
 			fprintf(score_file, "\nRun %i\n", run + 1);
 			while (evals < evals_value && generations_since_improvement < maximum_stale_generations)
 			{
-				auto parent_indices = Parenting::overselection(random, individuals, children_size / 2);
+				std::vector<std::vector<int>> parent_indices;
+				if (parent_selector == FPS)
+					parent_indices = Parenting::FPS(random, individuals, children_size / 2);
+				else
+					parent_indices = Parenting::overselection(random, individuals, children_size / 2);
 
 				auto children = Parenting::generate_children(random, individuals, parent_indices);
 
@@ -217,7 +237,10 @@ int main(int argc, char** argv)
 				std::inplace_merge(std::begin(individuals), std::begin(individuals) + population_size, std::end(individuals), [&](const Individual& a, const Individual& b) { return a.fitness > b.fitness; });
 				children.clear();
 
-				Survival::kTournament(random, individuals, population_size, 5);
+				if (survival_selector == TRUNCATION)
+					Survival::truncate(individuals, population_size);
+				else
+					Survival::kTournament(random, individuals, population_size, tournament_size);
 
 				fprintf(score_file, "%i\t%f\t%i\n", evals, average(individuals, [&](const Individual& i) {return i.game_fitness; }), best_run_individual.game_fitness);
 			} // Finished with run

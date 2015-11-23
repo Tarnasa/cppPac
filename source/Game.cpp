@@ -66,7 +66,7 @@ void Game::Step()
 	ghost_actions.reserve(state.ghosts.size());
 	for (size_t i = 0; i < state.ghosts.size(); ++i)
 	{
-		ghost_actions.emplace_back(ghost_controller->Decide(state));
+		ghost_actions.emplace_back(ghost_controller->Decide(i, state));
 	}
 
 	// Move actors
