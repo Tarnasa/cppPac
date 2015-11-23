@@ -80,7 +80,7 @@ void Game::Step()
 			game_over = true;
 	}
 
-	// Check for game over confitions
+	// Check for game over conditions
 	time_remaining -= 1;
 	if (time_remaining <= 0 || state.pacman.dots_eaten == dots_placed)
 	{

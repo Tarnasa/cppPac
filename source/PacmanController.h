@@ -45,25 +45,11 @@ namespace PacmanController
 
 		explicit PacmanController() {};
 
-		PacmanController(std::mt19937& random) : root()
-		{
-			Brain::Node* sum_node = new Brain::SumNode();
-			root.children.emplace_back(sum_node);
-			sum_node->children.push_back(new Brain::ProductNode());
-			sum_node->children[0]->children.push_back(new Brain::ConstantNode(-1.0));
-			sum_node->children[0]->children.push_back(new Brain::PacmanToDotNode());
-			sum_node->children.push_back(new Brain::ProductNode());
-			sum_node->children[1]->children.push_back(new Brain::ConstantNode(100.0));
-			sum_node->children[1]->children.push_back(new Brain::PacmanDotsEatenNode());
-			// root.children.push_back(new Brain::ProductNode());
-			// root.children[2]->children.push_back(new Brain::ConstantNode(0.01));
-			// root.children[2]->children.push_back(new Brain::PacmanToGhostNode());
-		};
-
 		explicit PacmanController(const PacmanController& rhs)
 		{
 			root.children.emplace_back(Brain::copy_tree(rhs.root.children[0]));
 		}
+
 		PacmanController& operator=(const PacmanController& rhs)
 		{
 			if (root.children.size() != 0) delete root.children[0];
@@ -96,7 +82,7 @@ namespace PacmanController
 			for (int i = 0; i < Hold; ++i)
 			{
 				GameState new_state(state);
-				new_state.MovePacman(deltas[i]);
+				if (!new_state.MovePacman(deltas[i])) continue;
 				new_state.UpdateDistances();
 				double fitness = Evaluate(new_state);
 				if (fitness > best_fitness)

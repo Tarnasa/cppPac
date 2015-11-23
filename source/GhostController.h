@@ -41,7 +41,7 @@ namespace GhostController
 			for (int i = 0; i < GHOST_ACTION_COUNT; ++i)
 			{
 				GameState new_state(state);
-				new_state.MoveGhost(i, deltas[i]);
+				if (!new_state.MoveGhost(i, deltas[i])) continue;
 				new_state.UpdateDistances();
 				double fitness = Evaluate(new_state);
 				if (fitness > best_fitness)
