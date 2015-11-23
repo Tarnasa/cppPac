@@ -27,7 +27,7 @@ NOTE:
 If running on school computers, CMake does not seem to be set up correctly
   so instead just run this gcc command from the project root directory:
   
-g++ -std=c++11 -I dependencies/tclap-1.2.1/include/ source/*.cpp -o cppPac
+g++ -std=c++11 -I dependencies/tclap-1.2.1/include/ source/*.cpp -o cppPac -O3
 
 
 RUNNING:

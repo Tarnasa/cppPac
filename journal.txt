@@ -35,9 +35,9 @@ Average and best fitness
 Rename things
 print parameters
 Plots
+Test on school computers
 TODO:
 PDF
-Test on school computers
 
 Walls!
 
