@@ -146,13 +146,17 @@ int main(int argc, char** argv)
 			"Mutation Chance: %f\n"
 			"Initialization Height: %i\n"
 			"Parsimony Pressure: %f\n"
+			"Parent Selection Strategy: %s\n"
+			"Survival Selection Strategy: %s\n"
+			"Tournament Size: %i\n"
 			"Random seed: %i\n"
 			"Runs: %i\n"
 			"Evals: %i\n"
 			"World file: %s\n"
 			"Score file: %s\n"
 			"Solution file: %s\n\nResult Log\n", width, height, density, population_size, children_size, mutation_chance,
-			initialization_height, parsimony_pressure, seed, runs_value, evals_value, world_filename_value.c_str(),
+			initialization_height, parsimony_pressure, parent_selection.c_str(), survival_selection.c_str(),
+			tournament_size, seed, runs_value, evals_value, world_filename_value.c_str(),
 			score_filename_value.c_str(), solution_filename_value.c_str());
 		printf("Board width: %i\n"
 			"Board height: %i\n"
@@ -162,13 +166,17 @@ int main(int argc, char** argv)
 			"Mutation Chance: %f\n"
 			"Initialization Height: %i\n"
 			"Parsimony Pressure: %f\n"
+			"Parent Selection Strategy: %s\n"
+			"Survival Selection Strategy: %s\n"
+			"Tournament Size: %i\n"
 			"Random seed: %i\n"
 			"Runs: %i\n"
 			"Evals: %i\n"
 			"World file: %s\n"
 			"Score file: %s\n"
 			"Solution file: %s\n\n", width, height, density, population_size, children_size, mutation_chance,
-			initialization_height, parsimony_pressure, seed, runs_value, evals_value, world_filename_value.c_str(),
+			initialization_height, parsimony_pressure, parent_selection.c_str(), survival_selection.c_str(),
+			tournament_size, seed, runs_value, evals_value, world_filename_value.c_str(),
 			score_filename_value.c_str(), solution_filename_value.c_str());
 
 		Individual best_individual(random);
