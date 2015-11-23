@@ -58,6 +58,7 @@ int main(int argc, char** argv)
 		cmd.add(arg_mutation_chance);
 		cmd.add(arg_initialization_height);
 		cmd.add(arg_parsimony_pressure);
+		cmd.add(arg_maximum_stale_generations);
 
 		cmd.add(arg_random_seed);
 		cmd.add(arg_runs);
@@ -150,7 +151,7 @@ int main(int argc, char** argv)
 			"Evals: %i\n"
 			"World file: %s\n"
 			"Score file: %s\n"
-			"Solution file: %s\n\nResult Log\n", width, height, density, population_size, children_size, mutation_chance,
+			"Solution file: %s\n\n", width, height, density, population_size, children_size, mutation_chance,
 			initialization_height, parsimony_pressure, seed, runs_value, evals_value, world_filename_value.c_str(),
 			score_filename_value.c_str(), solution_filename_value.c_str());
 
@@ -176,9 +177,9 @@ int main(int argc, char** argv)
 				i.evaluate(random);
 			evals += individuals.size();
 
-			std::sort(individuals.begin(), individuals.end(), [&](Individual& a, Individual& b) { return a.fitness > b.fitness; });
+			std::sort(individuals.begin(), individuals.end(), [&](const Individual& a, const Individual& b) { return a.fitness > b.fitness; });
 			
-			printf("Run %i:\n", run + 1);
+			printf("Run %i...\n", run + 1);
 			fprintf(score_file, "\nRun %i\n", run + 1);
 			while (evals < evals_value && generations_since_improvement < maximum_stale_generations)
 			{
@@ -245,4 +246,3 @@ int main(int argc, char** argv)
 
     return 0; // Program ran successfully
 }
-

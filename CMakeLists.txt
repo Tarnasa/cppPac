@@ -1,9 +1,9 @@
 if(CMAKE_MAJOR_VERSION LESS 3)
-   cmake_minimum_required(VERSION 2.6.0 FATAL_ERROR)
-   set(CPP11_OKAY FALSE)
+    cmake_minimum_required(VERSION 2.6.0 FATAL_ERROR)
+    set(CPP11_OKAY FALSE)
 elseif()
-   cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
-   set(CPP11_OKAY TRUE)
+    cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
+    set(CPP11_OKAY TRUE)
 endif()
 project( cppPac )
 
@@ -16,11 +16,11 @@ file(GLOB CPPPAC_SOURCES "source/*.cpp")
 
 # C++11
 if(CPP11_OKAY)
-	set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD 11)
 else()
-   if(UNIX OR MINGW)
-	  set(CMAKE_CXXFLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-   endif()
+    if(UNIX OR MINGW)
+        set(CMAKE_CXXFLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    endif()
 endif()
 
 # executable file for the ea
