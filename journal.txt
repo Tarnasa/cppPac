@@ -36,8 +36,8 @@ Rename things
 print parameters
 Plots
 Test on school computers
-TODO:
 PDF
+TODO:
 
 Walls!
 
