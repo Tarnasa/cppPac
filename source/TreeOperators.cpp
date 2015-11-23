@@ -70,7 +70,7 @@ namespace Brain
 		node = generate_tree(random, height);
 	}
 
-	void grow(std::mt19937& random, Node*& node, int max_levels) // Replaces a leaf node with a new tree of possibly greater height
+	void grow(std::mt19937& random, Node*& node, int max_levels) // Replaces a node with a new tree of possibly greater height
 	{
 		if (node->children.size() == 0)
 		{
@@ -84,7 +84,7 @@ namespace Brain
 		}
 	}
 
-	void mutate(std::mt19937& random, BufferNode* root) // Applies either replace one node or grow
+	void mutate(std::mt19937& random, BufferNode* root, int grow_max_levels) // Applies either replace one node or grow
 	{
 		if (chance(random, 0.5))
 		{
@@ -92,7 +92,7 @@ namespace Brain
 		}
 		else
 		{
-			grow(random, root->children[0], 3);
+			grow(random, root->children[0], grow_max_levels);
 		}
 	}
 

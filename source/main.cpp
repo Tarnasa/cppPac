@@ -197,7 +197,7 @@ int main(int argc, char** argv)
 				{
 					for (auto&& child : children)
 					{
-						Brain::mutate(random, &child.pacman_controller.root);
+						Brain::mutate(random, &child.pacman_controller.root, initialization_height);
 					}
 				}
 				// Sort children
