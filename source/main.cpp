@@ -123,12 +123,12 @@ int main(int argc, char** argv)
 		buffer_size += length_of_step * time_limit;
 
 		// Send global parameters to individual
-		Individual::width = width;
-		Individual::height = height;
-		Individual::density = density;
-		Individual::time_limit = time_limit;
-		Individual::buffer_size = buffer_size;
-		Individual::parsimony_pressure = parsimony_pressure;
+		PacmanIndividual::width = width;
+		PacmanIndividual::height = height;
+		PacmanIndividual::density = density;
+		PacmanIndividual::time_limit = time_limit;
+		PacmanIndividual::buffer_size = buffer_size;
+		PacmanIndividual::parsimony_pressure = parsimony_pressure;
 
 		GameState::InitializeNeighbors(width, height);
 
@@ -182,7 +182,7 @@ int main(int argc, char** argv)
 			score_filename_value.c_str(), solution_filename_value.c_str());
 
 		// Keep track of best overall individual
-		Individual best_individual(random);
+		PacmanIndividual best_individual(random);
 		best_individual.fitness = 0;
 		best_individual.valid_fitness = true;
 
@@ -190,7 +190,7 @@ int main(int argc, char** argv)
 		for (int run = 0; run < runs_value; ++run)
 		{
 			// Keep track of best individual for the run
-			Individual best_run_individual(random);
+			PacmanIndividual best_run_individual(random);
 			best_run_individual.fitness = 0;
 			best_run_individual.valid_fitness = true;
 
@@ -205,7 +205,7 @@ int main(int argc, char** argv)
 			evals += individuals.size();
 
 			// Sort individuals, highest fitness first
-			std::sort(individuals.begin(), individuals.end(), [&](const Individual& a, const Individual& b) { return a.fitness > b.fitness; });
+			std::sort(individuals.begin(), individuals.end(), [&](const PacmanIndividual& a, const PacmanIndividual& b) { return a.fitness > b.fitness; });
 			
 			printf("Run %i...\n", run + 1);
 			fprintf(score_file, "\nRun %i\n", run + 1);
@@ -236,7 +236,7 @@ int main(int argc, char** argv)
 				}
 
 				// Sort children, highest fitness first
-				std::sort(children.begin(), children.end(), [&](const Individual& a, const Individual& b) { return a.fitness > b.fitness; });
+				std::sort(children.begin(), children.end(), [&](const PacmanIndividual& a, const PacmanIndividual& b) { return a.fitness > b.fitness; });
 
 				// Check for improvement, Record best child
 				if (children[0].fitness > best_run_individual.fitness)
@@ -252,7 +252,7 @@ int main(int argc, char** argv)
 				// Merge children into individuals and maintain sorted property
 				individuals.reserve(individuals.size() + children.size());
 				std::move(std::begin(children), std::end(children), std::back_inserter(individuals));
-				std::inplace_merge(std::begin(individuals), std::begin(individuals) + population_size, std::end(individuals), [&](const Individual& a, const Individual& b) { return a.fitness > b.fitness; });
+				std::inplace_merge(std::begin(individuals), std::begin(individuals) + population_size, std::end(individuals), [&](const PacmanIndividual& a, const PacmanIndividual& b) { return a.fitness > b.fitness; });
 				children.clear();
 
 				// Choose survivors from combined individuals + children pool
@@ -261,7 +261,7 @@ int main(int argc, char** argv)
 				else
 					Survival::kTournament(random, individuals, population_size, tournament_size);
 
-				fprintf(score_file, "%i\t%f\t%i\n", evals, average(individuals, [&](const Individual& i) {return i.game_fitness; }), best_run_individual.game_fitness);
+				fprintf(score_file, "%i\t%f\t%i\n", evals, average(individuals, [&](const PacmanIndividual& i) {return i.game_fitness; }), best_run_individual.game_fitness);
 			} // Finished with run
 
 			if (best_run_individual.fitness > best_individual.fitness)

@@ -7,7 +7,7 @@
 
 namespace Parenting
 {
-	std::vector<std::vector<int>> FPS(std::mt19937& random, const std::vector<Individual>& individuals, int number_to_select)
+	std::vector<std::vector<int>> FPS(std::mt19937& random, const std::vector<PacmanIndividual>& individuals, int number_to_select)
 	{
 		std::vector<std::vector<int>> parents;
 		// Use stochastic acceptance instead of naive CDF (https://en.wikipedia.org/wiki/Fitness_proportionate_selection)
@@ -32,7 +32,7 @@ namespace Parenting
 		return parents;
 	}
 
-	std::vector<std::vector<int>> overselection(std::mt19937& random, const std::vector<Individual>& individuals, int number_to_select)
+	std::vector<std::vector<int>> overselection(std::mt19937& random, const std::vector<PacmanIndividual>& individuals, int number_to_select)
 	{
 		std::vector<std::vector<int>> parents;
 		// Find partition point
@@ -64,15 +64,15 @@ namespace Parenting
 		return parents;
 	}
 
-	std::vector<Individual> generate_children(std::mt19937& random, const std::vector<Individual>& individuals, const std::vector<std::vector<int>>& parent_indices)
+	std::vector<PacmanIndividual> generate_children(std::mt19937& random, const std::vector<PacmanIndividual>& individuals, const std::vector<std::vector<int>>& parent_indices)
 	{
-		std::vector<Individual> children;
+		std::vector<PacmanIndividual> children;
 		for (auto&& pair : parent_indices)
 		{
 			children.emplace_back(random);
 			children.emplace_back(random);
-			Individual& left = children[children.size() - 2];
-			Individual& right = children[children.size() - 1];
+			PacmanIndividual& left = children[children.size() - 2];
+			PacmanIndividual& right = children[children.size() - 1];
 			left.pacman_controller.root.children.emplace_back(Brain::copy_tree(individuals[pair[0]].pacman_controller.root.children[0]));
 			right.pacman_controller.root.children.emplace_back(Brain::copy_tree(individuals[pair[1]].pacman_controller.root.children[0]));
 			Brain::crossover(random, &left.pacman_controller.root, &right.pacman_controller.root);

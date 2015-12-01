@@ -2,12 +2,11 @@
 
 #pragma once
 
-#include <functional>
 #include <random>
 
 #include "GameState.h"
-#include "Helpers.h"
 #include "Node.h"
+#include <assert.h>
 
 namespace GhostController
 {
@@ -16,10 +15,10 @@ namespace GhostController
 	};
 
 	static const std::vector<Position> deltas = {
-		Position(1, 0),
-		Position(0, 1),
-		Position(-1, 0),
-		Position(0, -1)
+		Position( 1,  0),
+		Position( 0,  1),
+		Position(-1,  0),
+		Position( 0, -1)
 	};
 
 	class GhostController
@@ -37,17 +36,18 @@ namespace GhostController
 		GhostAction Decide(int id, const GameState& state)
 		{
 			double best_fitness = std::numeric_limits<double>::min();
-			GhostAction best_action;
+			GhostAction best_action = GHOST_ACTION_COUNT;
 			for (int i = 0; i < GHOST_ACTION_COUNT; ++i)
 			{
 				GameState new_state(state);
+				new_state.current_ghost = id; // Tell the sensor nodes which ghost to look at
 				if (!new_state.MoveGhost(id, deltas[i])) continue;
 				new_state.UpdateDistances();
 				double fitness = Evaluate(new_state);
 				if (fitness > best_fitness)
 				{
 					best_fitness = fitness;
-					best_action = (GhostAction)i;
+					best_action = static_cast<GhostAction>(i);
 				}
 			}
 			return best_action;

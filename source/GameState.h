@@ -3,7 +3,6 @@
 #pragma once
 
 #include <vector>
-#include <memory>
 #include <string>
 
 #include "Position.h"
@@ -18,6 +17,8 @@ public:
 	std::vector<bool> dots;
 	Pacman pacman;
 	std::vector<Ghost> ghosts;
+
+	int current_ghost; // For ghost controller sensor nodes
 
 	GameState(int width, int height);
 

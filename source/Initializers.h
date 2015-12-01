@@ -8,9 +8,9 @@
 
 namespace Initializers
 {
-	std::vector<Individual> RampedHalfAndHalf(std::mt19937& random, int size, int max_levels)
+	std::vector<PacmanIndividual> RampedHalfAndHalf(std::mt19937& random, int size, int max_levels)
 	{
-		std::vector<Individual> individuals;
+		std::vector<PacmanIndividual> individuals;
 		individuals.reserve(size);
 		for (int i = 0; i < size; ++i)
 		{

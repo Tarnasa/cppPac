@@ -2,7 +2,6 @@
 #include <sstream>
 #include <cstdio>
 #include <limits.h>
-#include <deque>
 
 #include "Helpers.h"
 #include "GameState.h"
@@ -12,8 +11,9 @@ GameState::GameState(int width, int height) :
 	dots(width * height, false),
 	pacman(0, 0),
 	ghosts(),
-	seen(width * height, INT_MIN),
-	seen_counter(INT_MIN + 1)
+	current_ghost(0),
+	seen_counter(INT_MIN + 1),
+	seen(width * height, INT_MIN)
 {
 	// All ghosts start in the lower right hand corner
 	ghosts.emplace_back(0, width - 1, height - 1);
@@ -182,14 +182,25 @@ void GameState::UpdateDistances()
 	delete[] buffer;
 	seen_counter += 1;
 
-	// Calculate distance to ghosts
-	pacman.distance_to_ghost = INT_MAX;
+	// Calculate distance from pacman to ghosts
+	pacman.distance_to_ghost = std::numeric_limits<int>::max();
 	for (auto&& ghost : ghosts)
 	{
 		ghost.distance_to_pacman = abs(ghost.position - pacman.position);
 		if (ghost.distance_to_pacman < pacman.distance_to_ghost)
 		{
 			pacman.distance_to_ghost = ghost.distance_to_pacman;
+		}
+	}
+
+	// Find distance between current_ghost and nearest ghost
+	ghosts[current_ghost].distance_to_ghost = std::numeric_limits<int>::max();
+	for (auto&& other_ghost : ghosts)
+	{
+		if (other_ghost.id != current_ghost)
+		{
+			int distance = abs(other_ghost.position - ghosts[current_ghost].position);
+			ghosts[current_ghost].distance_to_ghost = distance < ghosts[current_ghost].distance_to_ghost ? distance : ghosts[current_ghost].distance_to_ghost;
 		}
 	}
 }
@@ -224,8 +235,3 @@ int GameState::GetSeenAt(const Position& position)
 {
 	return bounds.Inside(position) ? seen[GetIndex(position)] : INT_MAX;
 }
-
-//void GameState::UpdateDistancesFromOther(const GameState& other)
-//{
-//	// If (old pacman and closest dot) > (new pacman and that same dot) then just use distance - 1
-//}

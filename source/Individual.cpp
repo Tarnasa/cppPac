@@ -2,14 +2,16 @@
 
 #include "TreeGetters.h"
 
-int Individual::width = 0;
-int Individual::height = 0;
-double Individual::density = 0.0;
-int Individual::time_limit = 0;
-int Individual::buffer_size = 0;
-double Individual::parsimony_pressure = 0.0;
+// These globals will be set by main
+int PacmanIndividual::width = 0;
+int PacmanIndividual::height = 0;
+double PacmanIndividual::density = 0.0;
+int PacmanIndividual::time_limit = 0;
+int PacmanIndividual::buffer_size = 0;
+double PacmanIndividual::parsimony_pressure = 0.0;
 
-void Individual::evaluate(std::mt19937& random)
+
+void PacmanIndividual::evaluate(std::mt19937& random)
 {
 	if (!valid_fitness)
 	{
@@ -23,7 +25,7 @@ void Individual::evaluate(std::mt19937& random)
 	}
 }
 
-void Individual::steal_buffer(Individual& rhs)
+void PacmanIndividual::steal_buffer(PacmanIndividual& rhs)
 {
 	pacman_controller = rhs.pacman_controller;
 	// TODO: Ghost controller

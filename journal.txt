@@ -45,3 +45,12 @@ multiple game runs for one eval
 
 s-exp printer and loader
 Make sure initial not identical
+
+
+2c:
+Ghost sensors
+Replace old style INT_MAX with numeric_limits
+Refactor board parameters
+GhostIndivual
+Separate update distances for pacman and ghost
+Create gamestate delta for deciding best action
