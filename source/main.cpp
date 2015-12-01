@@ -122,7 +122,7 @@ int main(int argc, char** argv)
 		buffer_size += get_printf_length(128, "p %i %i\n", width, height) * (width * height);
 		buffer_size += length_of_step * time_limit;
 
-		// Send parameters to individual
+		// Send global parameters to individual
 		Individual::width = width;
 		Individual::height = height;
 		Individual::density = density;
@@ -181,6 +181,7 @@ int main(int argc, char** argv)
 			tournament_size, seed, runs_value, evals_value, world_filename_value.c_str(),
 			score_filename_value.c_str(), solution_filename_value.c_str());
 
+		// Keep track of best overall individual
 		Individual best_individual(random);
 		best_individual.fitness = 0;
 		best_individual.valid_fitness = true;
@@ -203,26 +204,29 @@ int main(int argc, char** argv)
 				i.evaluate(random);
 			evals += individuals.size();
 
+			// Sort individuals, highest fitness first
 			std::sort(individuals.begin(), individuals.end(), [&](const Individual& a, const Individual& b) { return a.fitness > b.fitness; });
 			
 			printf("Run %i...\n", run + 1);
 			fprintf(score_file, "\nRun %i\n", run + 1);
 			while (evals < evals_value && generations_since_improvement < maximum_stale_generations)
 			{
+				// Generate parent pairs
 				std::vector<std::vector<int>> parent_indices;
 				if (parent_selector == FPS)
 					parent_indices = Parenting::FPS(random, individuals, children_size / 2);
 				else
 					parent_indices = Parenting::overselection(random, individuals, children_size / 2);
 
+				// Generate children from pairs of parents
 				auto children = Parenting::generate_children(random, individuals, parent_indices);
 
+				// Evaluate children
 				for (auto&& i : children)
-				{
 					i.evaluate(random);
-				}
 				evals += children.size();
 
+				// Randomly apply mutation to children
 				if (chance(random, mutation_chance))
 				{
 					for (auto&& child : children)
@@ -230,8 +234,11 @@ int main(int argc, char** argv)
 						Brain::mutate(random, &child.pacman_controller.root, initialization_height);
 					}
 				}
-				// Sort children
+
+				// Sort children, highest fitness first
 				std::sort(children.begin(), children.end(), [&](const Individual& a, const Individual& b) { return a.fitness > b.fitness; });
+
+				// Check for improvement, Record best child
 				if (children[0].fitness > best_run_individual.fitness)
 				{
 					best_run_individual.steal_buffer(children[0]);
@@ -242,11 +249,13 @@ int main(int argc, char** argv)
 					generations_since_improvement += 1;
 				}
 
+				// Merge children into individuals and maintain sorted property
 				individuals.reserve(individuals.size() + children.size());
 				std::move(std::begin(children), std::end(children), std::back_inserter(individuals));
 				std::inplace_merge(std::begin(individuals), std::begin(individuals) + population_size, std::end(individuals), [&](const Individual& a, const Individual& b) { return a.fitness > b.fitness; });
 				children.clear();
 
+				// Choose survivors from combined individuals + children pool
 				if (survival_selector == TRUNCATION)
 					Survival::truncate(individuals, population_size);
 				else
