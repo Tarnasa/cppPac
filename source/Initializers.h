@@ -3,14 +3,15 @@
 #include <vector>
 #include <random>
 
-#include "Individual.h"
+#include "PacmanIndividual.h"
 #include "TreeGenerators.h"
 
 namespace Initializers
 {
-	std::vector<PacmanIndividual> RampedHalfAndHalf(std::mt19937& random, int size, int max_levels)
+	template<class IndividualType>
+	std::vector<IndividualType> RampedHalfAndHalf(std::mt19937& random, int size, int max_levels)
 	{
-		std::vector<PacmanIndividual> individuals;
+		std::vector<IndividualType> individuals;
 		individuals.reserve(size);
 		for (int i = 0; i < size; ++i)
 		{

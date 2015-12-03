@@ -18,14 +18,14 @@ namespace Brain
 		return copy;
 	}
 
-	void replace_one_node(std::mt19937& random, Node*& node) // Replaces one random node in the subtree
+	void replace_one_node(std::mt19937& random, Node*& node, bool is_ghost) // Replaces one random node in the subtree
 	{
 		if (node == nullptr) return;
 		if (node->children.size() == 0)
 		{
 			// Replace this one
 			delete node;
-			node = generate_terminal_node(random);
+			node = generate_terminal_node(random, is_ghost);
 		}
 		else
 		{
@@ -50,7 +50,7 @@ namespace Brain
 				Node* child = parent->children[child_index];
 				if (child->children.size() == 0)
 				{
-					parent->children[child_index] = generate_terminal_node(random);
+					parent->children[child_index] = generate_terminal_node(random, is_ghost);
 				}
 				else
 				{
@@ -63,36 +63,36 @@ namespace Brain
 		}
 	}
 
-	void replace(std::mt19937& random, Node*& node) // Replaces node with a new tree of equal height
+	void replace(std::mt19937& random, Node*& node, bool is_ghost) // Replaces node with a new tree of equal height
 	{
 		int height = count_levels(node);
 		delete node;
-		node = generate_tree(random, height);
+		node = generate_tree(random, height, is_ghost);
 	}
 
-	void grow(std::mt19937& random, Node*& node, int max_levels) // Replaces a node with a new tree of possibly greater height
+	void grow(std::mt19937& random, Node*& node, int max_levels, bool is_ghost) // Replaces a node with a new tree of possibly greater height
 	{
 		if (node->children.size() == 0)
 		{
 			delete node;
-			node = generate_tree_up_to(random, max_levels);
+			node = generate_tree_up_to(random, max_levels, is_ghost);
 		}
 		else
 		{
 			Node* parent = get_random_parent_node(random, node);
-			grow(random, parent->children[random_int(random, 0, parent->children.size() - 1)], max_levels);
+			grow(random, parent->children[random_int(random, 0, parent->children.size() - 1)], max_levels, is_ghost);
 		}
 	}
 
-	void mutate(std::mt19937& random, BufferNode* root, int grow_max_levels) // Applies either replace one node or grow
+	void mutate(std::mt19937& random, BufferNode* root, int grow_max_levels, bool is_ghost) // Applies either replace one node or grow
 	{
 		if (chance(random, 0.5))
 		{
-			replace_one_node(random, root->children[0]);
+			replace_one_node(random, root->children[0], is_ghost);
 		}
 		else
 		{
-			grow(random, root->children[0], grow_max_levels);
+			grow(random, root->children[0], grow_max_levels, is_ghost);
 		}
 	}
 

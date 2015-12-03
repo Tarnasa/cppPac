@@ -3,7 +3,7 @@
 #include <vector>
 #include <random>
 
-#include "Individual.h"
+#include "PacmanIndividual.h"
 
 namespace Survival
 {

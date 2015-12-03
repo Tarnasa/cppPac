@@ -63,11 +63,4 @@ namespace Brain
 		crossover(random, &buffer, &buffer2);
 		return ToEquation(&buffer) + " AND " + ToEquation(&buffer2);
 	}
-
-	std::string Test2(std::mt19937& random)
-	{
-		BufferNode buffer;
-		buffer.children.emplace_back(generate_tree_up_to(random, 5));
-		return ToEquation(&buffer);
-	}
 }

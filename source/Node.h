@@ -37,6 +37,8 @@ namespace Brain
 		PacmanDotsEaten,
 		PacmanX,
 		PacmanY,
+		GhostToGhost,
+		GhostToPacman,
 		NUMBER_OF_NODE_TYPES
 	};
 
@@ -187,5 +189,25 @@ namespace Brain
 		double Forward(const GameState& state) { return state.pacman.position.y; }
 		virtual Node* Clone() const { return new PacmanYNode(*this); }
 		virtual char GetChar() const { return 'Y'; }
+	};
+
+	class GhostToGhostNode : public TerminalNode
+	{
+	public:
+		GhostToGhostNode() {};
+
+		double Forward(const GameState& state) { return state.ghosts[state.current_ghost].distance_to_ghost; }
+		virtual Node* Clone() const { return new GhostToGhostNode(*this); }
+		virtual char GetChar() const { return 'g'; }
+	};
+
+	class GhostToPacmanNode : public TerminalNode
+	{
+	public:
+		GhostToPacmanNode() {};
+
+		double Forward(const GameState& state) { return state.ghosts[state.current_ghost].distance_to_pacman; }
+		virtual Node* Clone() const { return new GhostToPacmanNode(*this); }
+		virtual char GetChar() const { return 'p'; }
 	};
 }

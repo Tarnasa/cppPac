@@ -199,7 +199,7 @@ int main(int argc, char** argv)
 			int generations_since_improvement = 0;
 
 			// Initialize the set of individuals
-			auto individuals = Initializers::RampedHalfAndHalf(random, population_size, initialization_height);
+			auto individuals = Initializers::RampedHalfAndHalf<PacmanIndividual>(random, population_size, initialization_height);
 			for (auto&& i : individuals)
 				i.evaluate(random);
 			evals += individuals.size();
@@ -231,7 +231,7 @@ int main(int argc, char** argv)
 				{
 					for (auto&& child : children)
 					{
-						Brain::mutate(random, &child.pacman_controller.root, initialization_height);
+						Brain::mutate(random, &child.pacman_controller.root, initialization_height, false);
 					}
 				}
 

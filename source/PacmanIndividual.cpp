@@ -1,4 +1,4 @@
-#include "Individual.h"
+#include "PacmanIndividual.h"
 
 #include "TreeGetters.h"
 

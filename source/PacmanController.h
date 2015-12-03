@@ -35,11 +35,11 @@ namespace PacmanController
 		{
 			if (full)
 			{
-				root.children.emplace_back(Brain::generate_full_tree(random, max_levels));
+				root.children.emplace_back(Brain::generate_full_tree(random, max_levels, false));
 			}
 			else
 			{
-				root.children.emplace_back(Brain::generate_tree_up_to(random, max_levels));
+				root.children.emplace_back(Brain::generate_tree_up_to(random, max_levels, false));
 			}
 		}
 
