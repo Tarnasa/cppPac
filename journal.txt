@@ -48,12 +48,21 @@ Make sure initial not identical
 
 
 Ghost sensors
-2c:
 Replace old style INT_MAX with numeric_limits
-Refactor board parameters
+2c:
 GhostIndivual
-Separate update distances for pacman and ghost
+Cumulative average fitness
+	Move buffer into Game
+	in main.cpp
+Config for ghost pool
+OPTIMIZE:
 Create gamestate delta for deciding best action
+Separate update distances for pacman and ghost
+CLEANUP:
+Refactor board parameters
+SOMEHOW MAKE Forward() const
+	Make game.Initialize
+	Individual.evaluate
 
 mean
 variances or deviations

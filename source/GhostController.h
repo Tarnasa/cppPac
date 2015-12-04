@@ -24,9 +24,46 @@ namespace GhostController
 	class GhostController
 	{
 	public:
-		Brain::RandomNode root;
+		Brain::BufferNode root;
 
-		GhostController(std::mt19937& random) : root(random) {};
+		GhostController() {};
+
+		GhostController(std::mt19937& random, int max_levels, bool full)
+		{
+			if (full)
+			{
+				root.children.emplace_back(Brain::generate_full_tree(random, max_levels, true));
+			}
+			else
+			{
+				root.children.emplace_back(Brain::generate_tree_up_to(random, max_levels, true));
+			}
+		}
+
+		GhostController(const GhostController& rhs)
+		{
+			root.children.emplace_back(Brain::copy_tree(rhs.root.children[0]));
+		}
+
+		GhostController& operator=(const GhostController& rhs)
+		{
+			if (root.children.size() != 0) delete root.children[0];
+			if (root.children.size() == 0) root.children.emplace_back(nullptr);
+			root.children[0] = Brain::copy_tree(rhs.root.children[0]);
+			return *this;
+		}
+
+		GhostController(GhostController&& rhs)
+		{
+			root = rhs.root;
+			rhs.root.children.clear();
+		}
+		GhostController& operator=(GhostController&& rhs)
+		{
+			root = rhs.root;
+			rhs.root.children.clear();
+			return *this;
+		}
 
 		double Evaluate(const GameState& state)
 		{

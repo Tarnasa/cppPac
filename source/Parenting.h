@@ -4,13 +4,15 @@
 #include <random>
 
 #include "PacmanIndividual.h"
+#include "GhostIndividual.h"
 
 namespace Parenting
 {
-	std::vector<std::vector<int>> FPS(std::mt19937& random, const std::vector<PacmanIndividual>& individuals, int number_to_select)
+	template<class IndividualType>
+	std::vector<std::vector<int>> FPS(std::mt19937& random, const std::vector<IndividualType>& individuals, int number_to_select)
 	{
 		std::vector<std::vector<int>> parents;
-		// Use stochastic acceptance instead of naive CDF (https://en.wikipedia.org/wiki/Fitness_proportionate_selection)
+		// Use stochastic acceptance instead of CDF (https://en.wikipedia.org/wiki/Fitness_proportionate_selection)
 		int max_fitness = individuals[0].fitness;
 		//int max_fitness = std::max_element(individuals.begin(), individuals.end(), [&](Individual& a) { return a.GetFitness(random); })->GetFitness(random);
 		for (int child_index = 0; child_index < number_to_select; ++child_index)
@@ -32,6 +34,7 @@ namespace Parenting
 		return parents;
 	}
 
+	template<class PacmanIndividual>
 	std::vector<std::vector<int>> overselection(std::mt19937& random, const std::vector<PacmanIndividual>& individuals, int number_to_select)
 	{
 		std::vector<std::vector<int>> parents;
@@ -69,13 +72,29 @@ namespace Parenting
 		std::vector<PacmanIndividual> children;
 		for (auto&& pair : parent_indices)
 		{
-			children.emplace_back(random);
-			children.emplace_back(random);
+			children.emplace_back();
+			children.emplace_back();
 			PacmanIndividual& left = children[children.size() - 2];
 			PacmanIndividual& right = children[children.size() - 1];
 			left.pacman_controller.root.children.emplace_back(Brain::copy_tree(individuals[pair[0]].pacman_controller.root.children[0]));
 			right.pacman_controller.root.children.emplace_back(Brain::copy_tree(individuals[pair[1]].pacman_controller.root.children[0]));
 			Brain::crossover(random, &left.pacman_controller.root, &right.pacman_controller.root);
+		}
+		return children;
+	}
+
+	std::vector<GhostIndividual> generate_children(std::mt19937& random, const std::vector<GhostIndividual>& individuals, const std::vector<std::vector<int>>& parent_indices)
+	{
+		std::vector<GhostIndividual> children;
+		for (auto&& pair : parent_indices)
+		{
+			children.emplace_back();
+			children.emplace_back();
+			GhostIndividual& left = children[children.size() - 2];
+			GhostIndividual& right = children[children.size() - 1];
+			left.ghost_controller.root.children.emplace_back(Brain::copy_tree(individuals[pair[0]].ghost_controller.root.children[0]));
+			right.ghost_controller.root.children.emplace_back(Brain::copy_tree(individuals[pair[1]].ghost_controller.root.children[0]));
+			Brain::crossover(random, &left.ghost_controller.root, &right.ghost_controller.root);
 		}
 		return children;
 	}

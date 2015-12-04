@@ -7,12 +7,14 @@
 
 namespace Survival
 {
-	void truncate(std::vector<PacmanIndividual>& individuals, int number_to_select)
+	template<class IndividualType>
+	void truncate(std::vector<IndividualType>& individuals, int number_to_select)
 	{
 		individuals.erase(individuals.begin() + number_to_select, individuals.begin() + individuals.size());
 	}
 
-	void kTournament(std::mt19937& random, std::vector<PacmanIndividual>& individuals, int number_to_select, int tournament_size)
+	template<class IndividualType>
+	void kTournament(std::mt19937& random, std::vector<IndividualType>& individuals, int number_to_select, int tournament_size)
 	{
 		for (size_t partition_index = 0; partition_index < (individuals.size() - number_to_select); ++partition_index)
 		{
@@ -26,6 +28,6 @@ namespace Survival
 			std::swap(individuals[partition_index], individuals[dead_index]);
 		}
 		individuals.erase(individuals.begin(), individuals.begin() + (individuals.size() - number_to_select));
-		std::sort(individuals.begin(), individuals.end(), [&](const PacmanIndividual& a, const PacmanIndividual& b) { return a.fitness > b.fitness; });
+		std::sort(individuals.begin(), individuals.end(), [&](const IndividualType& a, const IndividualType& b) { return a.fitness > b.fitness; });
 	}
 }

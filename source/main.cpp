@@ -18,6 +18,7 @@
 #include "Initializers.h"
 #include "Parenting.h"
 #include "Survival.h"
+#include "GhostIndividual.h"
 
 int main(int argc, char** argv)
 {
@@ -122,13 +123,19 @@ int main(int argc, char** argv)
 		buffer_size += get_printf_length(128, "p %i %i\n", width, height) * (width * height);
 		buffer_size += length_of_step * time_limit;
 
-		// Send global parameters to individual
+		// Send global parameters to individual TODO: Get rid of these
 		PacmanIndividual::width = width;
 		PacmanIndividual::height = height;
 		PacmanIndividual::density = density;
 		PacmanIndividual::time_limit = time_limit;
 		PacmanIndividual::buffer_size = buffer_size;
 		PacmanIndividual::parsimony_pressure = parsimony_pressure;
+		GhostIndividual::width = width;
+		GhostIndividual::height = height;
+		GhostIndividual::density = density;
+		GhostIndividual::time_limit = time_limit;
+		GhostIndividual::buffer_size = buffer_size;
+		GhostIndividual::parsimony_pressure = parsimony_pressure;
 
 		GameState::InitializeNeighbors(width, height);
 
@@ -182,66 +189,90 @@ int main(int argc, char** argv)
 			score_filename_value.c_str(), solution_filename_value.c_str());
 
 		// Keep track of best overall individual
-		PacmanIndividual best_individual(random);
+		PacmanIndividual best_individual;
 		best_individual.fitness = 0;
-		best_individual.valid_fitness = true;
 
 		// Run the EA!
 		for (int run = 0; run < runs_value; ++run)
 		{
 			// Keep track of best individual for the run
-			PacmanIndividual best_run_individual(random);
+			PacmanIndividual best_run_individual;
 			best_run_individual.fitness = 0;
-			best_run_individual.valid_fitness = true;
 
 			// Termination checkers
 			int evals = 0;
 			int generations_since_improvement = 0;
 
 			// Initialize the set of individuals
-			auto individuals = Initializers::RampedHalfAndHalf<PacmanIndividual>(random, population_size, initialization_height);
-			for (auto&& i : individuals)
-				i.evaluate(random);
-			evals += individuals.size();
+			auto pacmans = Initializers::RampedHalfAndHalf<PacmanIndividual>(random, population_size, initialization_height);
+			auto ghosts = Initializers::RampedHalfAndHalf<GhostIndividual>(random, population_size, initialization_height);
+			int larger = pacmans.size() > ghosts.size() ? pacmans.size() : ghosts.size();
+			for (int i = 0; i < larger; ++i)
+			{
+				int pacman_index = static_cast<int>((i * pacmans.size()) / larger);
+				int ghost_index = static_cast<int>((i * ghosts.size()) / larger);
+				// TODO: Accumulate fitness
+				pacmans[pacman_index].evaluate(random, ghosts[ghost_index].ghost_controller);
+				ghosts[ghost_index].evaluateFromGameFitness(pacmans[pacman_index].game_fitness);
+				evals += 1;
+			}
 
 			// Sort individuals, highest fitness first
-			std::sort(individuals.begin(), individuals.end(), [&](const PacmanIndividual& a, const PacmanIndividual& b) { return a.fitness > b.fitness; });
+			std::sort(pacmans.begin(), pacmans.end(), [&](const PacmanIndividual& a, const PacmanIndividual& b) { return a.fitness > b.fitness; });
+			std::sort(ghosts.begin(), ghosts.end(), [&](const GhostIndividual& a, const GhostIndividual& b) { return a.fitness > b.fitness; });
 			
 			printf("Run %i...\n", run + 1);
 			fprintf(score_file, "\nRun %i\n", run + 1);
 			while (evals < evals_value && generations_since_improvement < maximum_stale_generations)
 			{
 				// Generate parent pairs
-				std::vector<std::vector<int>> parent_indices;
+				std::vector<std::vector<int>> pacman_parent_indices;
 				if (parent_selector == FPS)
-					parent_indices = Parenting::FPS(random, individuals, children_size / 2);
+					pacman_parent_indices = Parenting::FPS<PacmanIndividual>(random, pacmans, children_size / 2);
 				else
-					parent_indices = Parenting::overselection(random, individuals, children_size / 2);
+					pacman_parent_indices = Parenting::overselection<PacmanIndividual>(random, pacmans, children_size / 2);
+
+				std::vector<std::vector<int>> ghost_parent_indices;
+				if (parent_selector == FPS)
+					ghost_parent_indices = Parenting::FPS<GhostIndividual>(random, ghosts, children_size / 2);
+				else
+					ghost_parent_indices = Parenting::overselection<GhostIndividual>(random, ghosts, children_size / 2);
 
 				// Generate children from pairs of parents
-				auto children = Parenting::generate_children(random, individuals, parent_indices);
+				auto pacman_children = Parenting::generate_children(random, pacmans, pacman_parent_indices);
+				auto ghost_children = Parenting::generate_children(random, ghosts, ghost_parent_indices);
+
+				// Create lists sorted by number of fitness evaluations TODO:
 
 				// Evaluate children
-				for (auto&& i : children)
-					i.evaluate(random);
-				evals += children.size();
+				larger = pacman_children.size() > ghost_children.size() ? pacman_children.size() : ghost_children.size();
+				for (int i = 0; i < larger; ++i)
+				{
+					int pacman_index = static_cast<int>((i * pacman_children.size()) / larger);
+					int ghost_index = static_cast<int>((i * ghost_children.size()) / larger);
+					// TODO: Accumulate fitness
+					pacman_children[pacman_index].evaluate(random, ghost_children[ghost_index].ghost_controller);
+					ghost_children[ghost_index].evaluateFromGameFitness(pacman_children[pacman_index].game_fitness);
+					evals += 1;
+				}
 
 				// Randomly apply mutation to children
 				if (chance(random, mutation_chance))
 				{
-					for (auto&& child : children)
-					{
+					for (auto&& child : pacman_children)
 						Brain::mutate(random, &child.pacman_controller.root, initialization_height, false);
-					}
+					for (auto&& child : ghost_children)
+						Brain::mutate(random, &child.ghost_controller.root, initialization_height, true);
 				}
 
 				// Sort children, highest fitness first
-				std::sort(children.begin(), children.end(), [&](const PacmanIndividual& a, const PacmanIndividual& b) { return a.fitness > b.fitness; });
+				std::sort(pacman_children.begin(), pacman_children.end(), [&](const PacmanIndividual& a, const PacmanIndividual& b) { return a.fitness > b.fitness; });
+				std::sort(ghost_children.begin(), ghost_children.end(), [&](const GhostIndividual& a, const GhostIndividual& b) { return a.fitness > b.fitness; });
 
 				// Check for improvement, Record best child
-				if (children[0].fitness > best_run_individual.fitness)
+				if (pacman_children[0].fitness > best_run_individual.fitness)
 				{
-					best_run_individual.steal_buffer(children[0]);
+					best_run_individual.steal_buffer(pacman_children[0]);
 					generations_since_improvement = 0;
 				}
 				else
@@ -250,18 +281,28 @@ int main(int argc, char** argv)
 				}
 
 				// Merge children into individuals and maintain sorted property
-				individuals.reserve(individuals.size() + children.size());
-				std::move(std::begin(children), std::end(children), std::back_inserter(individuals));
-				std::inplace_merge(std::begin(individuals), std::begin(individuals) + population_size, std::end(individuals), [&](const PacmanIndividual& a, const PacmanIndividual& b) { return a.fitness > b.fitness; });
-				children.clear();
+				pacmans.reserve(pacmans.size() + pacman_children.size());
+				std::move(std::begin(pacman_children), std::end(pacman_children), std::back_inserter(pacmans));
+				ghosts.reserve(ghost_children.size() + ghost_children.size());
+				std::move(std::begin(ghost_children), std::end(ghost_children), std::back_inserter(ghosts));
 
+				std::inplace_merge(std::begin(pacmans), std::begin(pacmans) + population_size, std::end(pacmans), [&](const PacmanIndividual& a, const PacmanIndividual& b) { return a.fitness > b.fitness; });
+				std::inplace_merge(std::begin(ghosts), std::begin(ghosts) + population_size, std::end(ghosts), [&](const GhostIndividual& a, const GhostIndividual& b) { return a.fitness > b.fitness; });
+				pacman_children.clear();
+				ghost_children.clear();
+				
 				// Choose survivors from combined individuals + children pool
 				if (survival_selector == TRUNCATION)
-					Survival::truncate(individuals, population_size);
+					Survival::truncate<PacmanIndividual>(pacmans, population_size);
 				else
-					Survival::kTournament(random, individuals, population_size, tournament_size);
+					Survival::kTournament<PacmanIndividual>(random, pacmans, population_size, tournament_size);
 
-				fprintf(score_file, "%i\t%f\t%i\n", evals, average(individuals, [&](const PacmanIndividual& i) {return i.game_fitness; }), best_run_individual.game_fitness);
+				if (survival_selector == TRUNCATION)
+					Survival::truncate<GhostIndividual>(ghosts, population_size);
+				else
+					Survival::kTournament<GhostIndividual>(random, ghosts, population_size, tournament_size);
+
+				fprintf(score_file, "%i\t%f\t%i\n", evals, average(pacmans, [&](const PacmanIndividual& i) {return i.game_fitness; }), best_run_individual.game_fitness);
 			} // Finished with run
 
 			if (best_run_individual.fitness > best_individual.fitness)

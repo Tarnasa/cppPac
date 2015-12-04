@@ -233,5 +233,5 @@ std::vector<int> GameState::neighbors;
 
 int GameState::GetSeenAt(const Position& position)
 {
-	return bounds.Inside(position) ? seen[GetIndex(position)] : INT_MAX;
+	return bounds.Inside(position) ? seen[GetIndex(position)] : std::numeric_limits<int>::max();
 }

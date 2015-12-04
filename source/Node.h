@@ -20,7 +20,7 @@ namespace Brain
 		virtual Node* Clone() const = 0;
 		virtual char GetChar() const = 0;
 		virtual int GetMinChildren() const { return 0; }
-		virtual int GetMaxChildren() const { return INT_MAX; }
+		virtual int GetMaxChildren() const { return std::numeric_limits<int>::max(); }
 	};
 
 	enum NodeIds
