@@ -101,7 +101,7 @@ namespace Brain
 		}
 		else if (denominator == -0.0) // Negative zero
 		{
-			return std::numeric_limits<double>::min();
+			return -std::numeric_limits<double>::max();
 		}*/
 		double denominator = children[1]->Forward(state);
 		return children[0]->Forward(state) / denominator;

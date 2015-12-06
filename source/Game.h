@@ -2,34 +2,26 @@
 
 #pragma once
 
-#include <string>
-#include <functional>
 #include <random>
-#include <fstream>
+#include <memory>
 
-#include "GameState.h"
-#include "PacmanController.h"
-#include "GhostController.h"
+// Forward declarations
+class PacmanIndividual;
+class GhostIndividual;
 
+// This design pattern probably breaks so many rules
 class Game
 {
 public:
-	GameState state;
-	bool game_over;
-	int initial_time_remaining;
-	int time_remaining;
+	static int width, height, time_limit, buffer_size;
+	static double density;
+
 	int dots_placed;
-	PacmanController::PacmanController* pacman_controller;
-	GhostController::GhostController* ghost_controller;
+	int fitness;
+	std::unique_ptr<char> buffer;
 
-	Game(int width, int height, std::mt19937& random);
-	
-	void Initialize(std::mt19937& random, double density, int time_remaining,
-		PacmanController::PacmanController* pacman_controller,
-		GhostController::GhostController* ghost_controller);
+	static void fight(std::mt19937& random, PacmanIndividual& pacman, GhostIndividual& ghost);
 
-	void Step();
-	int RunTillDone(char* world_buffer);
-
-	int CalculateFitness();
+//private:
+	Game(std::mt19937& random, PacmanIndividual& pacman, GhostIndividual& ghost); // Should only be constructed from within fight()
 };

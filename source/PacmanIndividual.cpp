@@ -1,30 +1,10 @@
 #include "PacmanIndividual.h"
 
-#include "TreeGetters.h"
-
-// These globals will be set by main
-int PacmanIndividual::width = 0;
-int PacmanIndividual::height = 0;
-double PacmanIndividual::density = 0.0;
-int PacmanIndividual::time_limit = 0;
-int PacmanIndividual::buffer_size = 0;
-double PacmanIndividual::parsimony_pressure = 0.0;
-
-
-void PacmanIndividual::evaluate(std::mt19937& random, GhostController::GhostController& ghost_controller)
+double PacmanIndividual::add_game(std::shared_ptr<Game> game)
 {
-	buffer.reset(new char[buffer_size]);
-	Game game(width, height, random);
-	game.Initialize(random, density, time_limit, &pacman_controller, &ghost_controller);
-	game_fitness = game.RunTillDone(buffer.get());
-	int penalty = static_cast<int>(parsimony_pressure * Brain::count_nodes(&pacman_controller.root));
-	fitness = game_fitness + 200 - penalty;
-}
-
-void PacmanIndividual::steal_buffer(PacmanIndividual& rhs)
-{
-	pacman_controller = rhs.pacman_controller;
-	buffer.reset(rhs.buffer.release());
-	game_fitness = rhs.game_fitness;
-	fitness = rhs.fitness;
+	games.emplace_back(game);
+	int adjusted_fitness = 200 + game->fitness - penalty;
+	fitness = ((games.size() - 1) * fitness + adjusted_fitness) / games.size();
+	game_fitness = ((games.size() - 1) * game_fitness + game->fitness) / games.size();
+	return fitness;
 }

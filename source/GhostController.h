@@ -6,7 +6,8 @@
 
 #include "GameState.h"
 #include "Node.h"
-#include <assert.h>
+#include "TreeOperators.h"
+#include "TreeGenerators.h"
 
 namespace GhostController
 {
@@ -72,7 +73,7 @@ namespace GhostController
 
 		GhostAction Decide(int id, const GameState& state)
 		{
-			double best_fitness = std::numeric_limits<double>::min();
+			double best_fitness = -std::numeric_limits<double>::max();
 			GhostAction best_action = GHOST_ACTION_COUNT;
 			for (int i = 0; i < GHOST_ACTION_COUNT; ++i)
 			{

@@ -49,12 +49,14 @@ Make sure initial not identical
 
 Ghost sensors
 Replace old style INT_MAX with numeric_limits
-2c:
 GhostIndivual
 Cumulative average fitness
 	Move buffer into Game
 	in main.cpp
+2c:
+Do Todo:'s
 Config for ghost pool
+Write integers, not floats
 OPTIMIZE:
 Create gamestate delta for deciding best action
 Separate update distances for pacman and ghost

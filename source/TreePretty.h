@@ -40,6 +40,8 @@ namespace Brain
 		case 'E': ans += "dots_eaten"; break;
 		case 'X': ans += "pacman_x"; break;
 		case 'Y': ans += "pacman_y"; break;
+		case 'g': ans += "ghost_to_ghost"; break;
+		case 'p': ans += "ghost_to_pacman"; break;
 		}
 		return ans;
 	}

@@ -40,7 +40,14 @@ int get_length_int(int n);
 int get_printf_length(int max_length, const char* format, ...);
 
 template<typename T>
-T choice(std::mt19937& random, const std::vector<T>& container)
+const T& choice(std::mt19937& random, const std::vector<T>& container)
+{
+	return container[std::uniform_int_distribution<int>(0, container.size() - 1)(random)];
+}
+
+// Non-const version
+template<typename T>
+T& choice(std::mt19937& random, std::vector<T>& container)
 {
 	return container[std::uniform_int_distribution<int>(0, container.size() - 1)(random)];
 }

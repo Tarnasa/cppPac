@@ -13,7 +13,7 @@ namespace Parenting
 	{
 		std::vector<std::vector<int>> parents;
 		// Use stochastic acceptance instead of CDF (https://en.wikipedia.org/wiki/Fitness_proportionate_selection)
-		int max_fitness = individuals[0].fitness;
+		double max_fitness = individuals[0].fitness;
 		//int max_fitness = std::max_element(individuals.begin(), individuals.end(), [&](Individual& a) { return a.GetFitness(random); })->GetFitness(random);
 		for (int child_index = 0; child_index < number_to_select; ++child_index)
 		{

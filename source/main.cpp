@@ -4,12 +4,11 @@
 #include <cstdio>
 #include <random>
 #include <time.h>
-#include <functional>
 #include <iostream>
-#include <fstream>
 
 #include "tclap/CmdLine.h"
 
+#include "MainHelpers.h"
 #include "ArgFilePopulator.h"
 #include "Game.h"
 #include "Helpers.h"
@@ -83,7 +82,7 @@ int main(int argc, char** argv)
 		// If an argument was specified multiple times, grab the last one (This allows easy overriding of a config file)
 		// If an argument was NOT specified, use a default value
 		int width = arg_board_width.getValue().size() ? arg_board_width.getValue().back() : 30;
-		int height = arg_board_height.getValue().size() ? arg_board_height.getValue().back() : 30;
+		int height = arg_board_height.getValue().size() ? arg_board_height.getValue().back() : 20;
 		double density = arg_pill_density.getValue().size() ? arg_pill_density.getValue().back() : 0.5;
 
 		int population_size = arg_populate_size.getValue().size() ? arg_populate_size.getValue().back() : 50;
@@ -93,7 +92,7 @@ int main(int argc, char** argv)
 		double parsimony_pressure = arg_parsimony_pressure.getValue().size() ? arg_parsimony_pressure.getValue().back() : 0.15;
 		int maximum_stale_generations = arg_maximum_stale_generations.getValue().size() ? arg_maximum_stale_generations.getValue().back() : -1;
 		
-		std::string parent_selection = arg_parent_selection.getValue().size() ? arg_parent_selection.getValue().back() : "fps";
+		std::string parent_selection = arg_parent_selection.getValue().size() ? arg_parent_selection.getValue().back() : "overselection";
 		std::string survival_selection = arg_survival_selection.getValue().size() ? arg_survival_selection.getValue().back() : "truncation";
 		int tournament_size = arg_tournament_size.getValue().size() ? arg_tournament_size.getValue().back() : 5;
 
@@ -107,7 +106,7 @@ int main(int argc, char** argv)
 
 		// More config logic
 		int time_limit = width * height * 2;
-		int seed = static_cast<int>(random_seed_value < 0 ? time(0) : random_seed_value);
+		int seed = static_cast<int>(random_seed_value < 0 ? time(nullptr) : random_seed_value);
 		// Treat negative as no convergence termination criteria
 		if (maximum_stale_generations <= 0) maximum_stale_generations = std::numeric_limits<int>::max();
 		std::mt19937 random(seed);
@@ -124,19 +123,13 @@ int main(int argc, char** argv)
 		buffer_size += length_of_step * time_limit;
 
 		// Send global parameters to individual TODO: Get rid of these
-		PacmanIndividual::width = width;
-		PacmanIndividual::height = height;
-		PacmanIndividual::density = density;
-		PacmanIndividual::time_limit = time_limit;
-		PacmanIndividual::buffer_size = buffer_size;
-		PacmanIndividual::parsimony_pressure = parsimony_pressure;
-		GhostIndividual::width = width;
-		GhostIndividual::height = height;
-		GhostIndividual::density = density;
-		GhostIndividual::time_limit = time_limit;
-		GhostIndividual::buffer_size = buffer_size;
-		GhostIndividual::parsimony_pressure = parsimony_pressure;
+		Game::width = width;
+		Game::height = height;
+		Game::density = density;
+		Game::time_limit = time_limit;
+		Game::buffer_size = buffer_size;
 
+		// Initialize neighbor cache
 		GameState::InitializeNeighbors(width, height);
 
 		// IOStreams are slow, just use c-style file io
@@ -144,49 +137,12 @@ int main(int argc, char** argv)
 		FILE* score_file = fopen(score_filename_value.c_str(), "w");
 		FILE* solution_file = fopen(solution_filename_value.c_str(), "w");
 
-		// Record and print out configuration options
-		fprintf(score_file, "Board width: %i\n"
-			"Board height: %i\n"
-			"Pill Density: %f\n"
-			"Population Size: %i\n"
-			"Children Size: %i\n"
-			"Mutation Chance: %f\n"
-			"Initialization Height: %i\n"
-			"Parsimony Pressure: %f\n"
-			"Maximum Stale Generations: %i\n"
-			"Parent Selection Strategy: %s\n"
-			"Survival Selection Strategy: %s\n"
-			"Tournament Size: %i\n"
-			"Random seed: %i\n"
-			"Runs: %i\n"
-			"Evals: %i\n"
-			"World file: %s\n"
-			"Score file: %s\n"
-			"Solution file: %s\n\nResult Log\n", width, height, density, population_size, children_size, mutation_chance,
-			initialization_height, parsimony_pressure, maximum_stale_generations, parent_selection.c_str(), survival_selection.c_str(),
-			tournament_size, seed, runs_value, evals_value, world_filename_value.c_str(),
-			score_filename_value.c_str(), solution_filename_value.c_str());
-		printf("Board width: %i\n"
-			"Board height: %i\n"
-			"Pill Density: %f\n"
-			"Population Size: %i\n"
-			"Children Size: %i\n"
-			"Mutation Chance: %f\n"
-			"Initialization Height: %i\n"
-			"Parsimony Pressure: %f\n"
-			"Maximum Stale Generations: %i\n"
-			"Parent Selection Strategy: %s\n"
-			"Survival Selection Strategy: %s\n"
-			"Tournament Size: %i\n"
-			"Random seed: %i\n"
-			"Runs: %i\n"
-			"Evals: %i\n"
-			"World file: %s\n"
-			"Score file: %s\n"
-			"Solution file: %s\n\n", width, height, density, population_size, children_size, mutation_chance,
-			initialization_height, parsimony_pressure, maximum_stale_generations, parent_selection.c_str(), survival_selection.c_str(),
-			tournament_size, seed, runs_value, evals_value, world_filename_value.c_str(),
-			score_filename_value.c_str(), solution_filename_value.c_str());
+		// Log and print out configuration options
+		print_args(score_file, 
+			width, height, density, population_size, children_size, mutation_chance,
+			initialization_height, parsimony_pressure, maximum_stale_generations, parent_selection, survival_selection,
+			tournament_size, seed, runs_value, evals_value, world_filename_value,
+			score_filename_value, solution_filename_value);
 
 		// Keep track of best overall individual
 		PacmanIndividual best_individual;
@@ -204,16 +160,14 @@ int main(int argc, char** argv)
 			int generations_since_improvement = 0;
 
 			// Initialize the set of individuals
-			auto pacmans = Initializers::RampedHalfAndHalf<PacmanIndividual>(random, population_size, initialization_height);
-			auto ghosts = Initializers::RampedHalfAndHalf<GhostIndividual>(random, population_size, initialization_height);
+			auto pacmans = Initializers::RampedHalfAndHalf<PacmanIndividual>(random, population_size, initialization_height, parsimony_pressure);
+			auto ghosts = Initializers::RampedHalfAndHalf<GhostIndividual>(random, population_size, initialization_height, parsimony_pressure);
 			int larger = pacmans.size() > ghosts.size() ? pacmans.size() : ghosts.size();
 			for (int i = 0; i < larger; ++i)
 			{
 				int pacman_index = static_cast<int>((i * pacmans.size()) / larger);
 				int ghost_index = static_cast<int>((i * ghosts.size()) / larger);
-				// TODO: Accumulate fitness
-				pacmans[pacman_index].evaluate(random, ghosts[ghost_index].ghost_controller);
-				ghosts[ghost_index].evaluateFromGameFitness(pacmans[pacman_index].game_fitness);
+				Game::fight(random, pacmans[pacman_index], ghosts[ghost_index]);
 				evals += 1;
 			}
 
@@ -242,20 +196,6 @@ int main(int argc, char** argv)
 				auto pacman_children = Parenting::generate_children(random, pacmans, pacman_parent_indices);
 				auto ghost_children = Parenting::generate_children(random, ghosts, ghost_parent_indices);
 
-				// Create lists sorted by number of fitness evaluations TODO:
-
-				// Evaluate children
-				larger = pacman_children.size() > ghost_children.size() ? pacman_children.size() : ghost_children.size();
-				for (int i = 0; i < larger; ++i)
-				{
-					int pacman_index = static_cast<int>((i * pacman_children.size()) / larger);
-					int ghost_index = static_cast<int>((i * ghost_children.size()) / larger);
-					// TODO: Accumulate fitness
-					pacman_children[pacman_index].evaluate(random, ghost_children[ghost_index].ghost_controller);
-					ghost_children[ghost_index].evaluateFromGameFitness(pacman_children[pacman_index].game_fitness);
-					evals += 1;
-				}
-
 				// Randomly apply mutation to children
 				if (chance(random, mutation_chance))
 				{
@@ -265,6 +205,18 @@ int main(int argc, char** argv)
 						Brain::mutate(random, &child.ghost_controller.root, initialization_height, true);
 				}
 
+				// Evaluate children by fighting them against a random individual from the previous generation
+				for (auto&& pacman_child : pacman_children)
+				{
+					Game::fight(random, pacman_child, choice(random, ghosts));
+					evals += 1;
+				}
+				for (auto&& ghost_child : ghost_children)
+				{
+					Game::fight(random, choice(random, pacmans), ghost_child);
+					evals += 1;
+				}
+
 				// Sort children, highest fitness first
 				std::sort(pacman_children.begin(), pacman_children.end(), [&](const PacmanIndividual& a, const PacmanIndividual& b) { return a.fitness > b.fitness; });
 				std::sort(ghost_children.begin(), ghost_children.end(), [&](const GhostIndividual& a, const GhostIndividual& b) { return a.fitness > b.fitness; });
@@ -272,7 +224,7 @@ int main(int argc, char** argv)
 				// Check for improvement, Record best child
 				if (pacman_children[0].fitness > best_run_individual.fitness)
 				{
-					best_run_individual.steal_buffer(pacman_children[0]);
+					best_run_individual = pacman_children[0];
 					generations_since_improvement = 0;
 				}
 				else
@@ -280,17 +232,16 @@ int main(int argc, char** argv)
 					generations_since_improvement += 1;
 				}
 
-				// Merge children into individuals and maintain sorted property
+				// Merge children into individuals
 				pacmans.reserve(pacmans.size() + pacman_children.size());
 				std::move(std::begin(pacman_children), std::end(pacman_children), std::back_inserter(pacmans));
 				ghosts.reserve(ghost_children.size() + ghost_children.size());
 				std::move(std::begin(ghost_children), std::end(ghost_children), std::back_inserter(ghosts));
 
-				std::inplace_merge(std::begin(pacmans), std::begin(pacmans) + population_size, std::end(pacmans), [&](const PacmanIndividual& a, const PacmanIndividual& b) { return a.fitness > b.fitness; });
-				std::inplace_merge(std::begin(ghosts), std::begin(ghosts) + population_size, std::end(ghosts), [&](const GhostIndividual& a, const GhostIndividual& b) { return a.fitness > b.fitness; });
-				pacman_children.clear();
-				ghost_children.clear();
-				
+				// Sort individuals, highest fitness first
+				std::sort(pacmans.begin(), pacmans.end(), [&](const PacmanIndividual& a, const PacmanIndividual& b) { return a.fitness > b.fitness; });
+				std::sort(ghosts.begin(), ghosts.end(), [&](const GhostIndividual& a, const GhostIndividual& b) { return a.fitness > b.fitness; });
+
 				// Choose survivors from combined individuals + children pool
 				if (survival_selector == TRUNCATION)
 					Survival::truncate<PacmanIndividual>(pacmans, population_size);
@@ -302,21 +253,40 @@ int main(int argc, char** argv)
 				else
 					Survival::kTournament<GhostIndividual>(random, ghosts, population_size, tournament_size);
 
-				fprintf(score_file, "%i\t%f\t%i\n", evals, average(pacmans, [&](const PacmanIndividual& i) {return i.game_fitness; }), best_run_individual.game_fitness);
+				double average_pacman_fitness = average(pacmans, [&](const PacmanIndividual& i) {return i.game_fitness; });
+				double average_ghost_fitness = average(ghosts, [&](const GhostIndividual& i) {return i.fitness; });
+				fprintf(score_file, "%i\t%f\t%f\n", evals, average_pacman_fitness, best_run_individual.game_fitness);
+
+				printf("pacman: %f, ghost: %f\n", average_pacman_fitness, average_ghost_fitness);
 			} // Finished with run
 
-			if (best_run_individual.fitness > best_individual.fitness)
+			// Ignore best individual of entire run and just find best individual of final population
+			if (pacmans[0].fitness > best_individual.fitness)
 			{
-				best_individual.steal_buffer(best_run_individual);
+				best_individual = pacmans[0];
 			}
 		} // Finished with EA
 
+		// Choose most representative game of best_individual
+		double best_difference = std::numeric_limits<double>::max();
+		std::shared_ptr<Game> best_game;
+		for (auto&& game : best_individual.games)
+		{
+			double difference = abs(game->fitness - best_individual.game_fitness);
+			if (difference < best_difference)
+			{
+				difference = best_difference;
+				best_game = game;
+			}
+		}
+
 		fclose(score_file);
-		fprintf(world_file, "%s", best_individual.buffer.get());
+		fprintf(world_file, "%s", best_game->buffer.get());
 		fclose(world_file);
-		fprintf(solution_file, "%i : %s\n", best_individual.game_fitness, Brain::ToEquation(&best_individual.pacman_controller.root).c_str());
+		fprintf(solution_file, "%f : %s\n", best_individual.game_fitness, Brain::ToEquation(&best_individual.pacman_controller.root).c_str());
 		fclose(solution_file);
 
+		std::cout << Brain::ToEquation(&best_individual.pacman_controller.root) << "\n";
 		std::cout << Brain::ToEquation(&best_individual.pacman_controller.root) << "\n";
 
 		puts("Done!\n");

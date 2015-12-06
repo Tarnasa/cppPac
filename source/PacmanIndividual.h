@@ -4,33 +4,31 @@
 #include <memory>
 
 #include "PacmanController.h"
-#include "GhostController.h"
 #include "Game.h"
+#include "TreeGetters.h"
 
 class PacmanIndividual
 {
 public:
-	static int width, height, time_limit, buffer_size;
-	static double density, parsimony_pressure;
-
 	PacmanController::PacmanController pacman_controller;
-	std::unique_ptr<char> buffer;
-	int game_fitness;
-	int fitness;
+	std::vector<std::shared_ptr<Game>> games;
+	double fitness;
+	double game_fitness;
+
+	int penalty;
 	
-	PacmanIndividual(std::mt19937& random, int max_levels, bool full) :
-		pacman_controller(random, max_levels, full)
+	PacmanIndividual(std::mt19937& random, int max_levels, bool full, double parsimony_pressure) :
+		pacman_controller(random, max_levels, full), fitness(0), game_fitness(0)
 	{
 		// Either full or grow
+		penalty = static_cast<int>(parsimony_pressure * Brain::count_nodes(&pacman_controller.root));
 	}
 
-	PacmanIndividual() : pacman_controller() {}
+	double add_game(std::shared_ptr<Game> game);
 
-	PacmanIndividual(const PacmanIndividual& rhs) = delete;
+	PacmanIndividual() : pacman_controller(), games(), fitness(0), game_fitness(0), penalty(0) {}
+	PacmanIndividual(const PacmanIndividual& rhs) = default;
 	PacmanIndividual(PacmanIndividual&& rhs) = default;
+	PacmanIndividual& operator=(const PacmanIndividual& rhs) = default;
 	PacmanIndividual& operator=(PacmanIndividual&& rhs) = default;
-
-	void evaluate(std::mt19937& random, GhostController::GhostController& ghost_controller);
-
-	void steal_buffer(PacmanIndividual& rhs);
 };
