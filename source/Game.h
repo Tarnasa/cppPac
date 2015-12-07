@@ -4,8 +4,10 @@
 
 #include <random>
 #include <memory>
+#include "PacmanController.h"
+#include "GhostController.h"
 
-// Forward declarations
+// Forward declarations - because of kinda-circular dependency
 class PacmanIndividual;
 class GhostIndividual;
 
@@ -20,7 +22,10 @@ public:
 	int fitness;
 	std::unique_ptr<char> buffer;
 
-
+	// Bluh
+	PacmanController::PacmanController pacman_controller;
+	GhostController::GhostController ghost_controller;
+	// End Bluh
 
 	static void fight(std::mt19937& random, PacmanIndividual& pacman, GhostIndividual& ghost);
 

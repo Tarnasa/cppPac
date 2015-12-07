@@ -2,15 +2,12 @@
 
 #pragma once
 
-#include <functional>
 #include <random>
-#include <limits>
 
 #include "GameState.h"
 #include "Node.h"
 #include "TreeGenerators.h"
 #include "TreeOperators.h"
-#include "Helpers.h"
 
 namespace PacmanController
 {
@@ -88,7 +85,7 @@ namespace PacmanController
 				if (fitness > best_fitness)
 				{
 					best_fitness = fitness;
-					best_action = (PacmanAction)i;
+					best_action = static_cast<PacmanAction>(i);
 				}
 			}
 			return best_action;

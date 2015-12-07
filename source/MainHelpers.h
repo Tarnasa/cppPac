@@ -1,5 +1,10 @@
 #pragma once
+
 #include <cstdio>
+
+#include "TreePretty.h"
+#include "PacmanIndividual.h"
+#include "GhostIndividual.h"
 
 inline void print_args(FILE* score_file,
 	int width, int height, double density,
@@ -70,4 +75,26 @@ inline void print_args(FILE* score_file,
 		population_size_ghost, children_size_ghost, mutation_chance_ghost, initialization_height_ghost, parsimony_pressure_ghost,
 		parent_selection_ghost.c_str(), survival_selection_ghost.c_str(), tournament_size_ghost,
 		seed, runs_value, evals_value, world_filename_value.c_str(), score_filename_value.c_str(), solution_filename_value.c_str());
+}
+
+inline std::string individual_string(const PacmanIndividual& pacman)
+{
+	return Brain::ToEquation(&pacman.pacman_controller.root) + " {" + Brain::to_s_expression(&pacman.pacman_controller.root) + "}";
+}
+
+inline std::string individual_string(const GhostIndividual& pacman)
+{
+	return Brain::ToEquation(&pacman.ghost_controller.root) + " {" + Brain::to_s_expression(&pacman.ghost_controller.root) + "}";
+}
+
+inline void write_match(std::mt19937& random, std::string filename, const std::string& pacman_string, const std::string& ghost_string)
+{
+	PacmanIndividual pacman;
+	GhostIndividual ghost;
+	pacman.pacman_controller.root.children.emplace_back(Brain::from_s_expression(random, pacman_string));
+	ghost.ghost_controller.root.children.emplace_back(Brain::from_s_expression(random, ghost_string));
+	Game::fight(random, pacman, ghost);
+	FILE* file = fopen(filename.c_str(), "w");
+	fprintf(file, "%s", pacman.games[0]->buffer.get());
+	fclose(file);
 }

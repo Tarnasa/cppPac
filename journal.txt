@@ -55,7 +55,9 @@ Cumulative average fitness
 	in main.cpp
 Remove termination from convergence
 Config for ghost pool
+Store competitor trees in game
 2c:
+Hall of fame
 Write integers, not floats
 Do Todo:'s
 OPTIMIZE:
@@ -78,3 +80,7 @@ All of this can be put on one line in a table
 Tell how we did this
 Assuming reader knows some EA things
 
+Interesting c++ fumble:
+	std::string s
+	s += function_returning_char + "(" + std::string() + ")";
+	char + "(" is adding ascii value of char to pointer to char array giving very weird results

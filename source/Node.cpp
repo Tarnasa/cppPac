@@ -43,7 +43,7 @@ namespace Brain
 	double RandomRangeNode::Forward(const GameState& state)
 	{
 		double left = children[0]->Forward(state);
-		double right = children[0]->Forward(state);
+		double right = children[1]->Forward(state);
 		double min = left;
 		double max = right;
 		if (left > right)

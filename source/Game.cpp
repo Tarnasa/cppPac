@@ -22,7 +22,7 @@ void Game::fight(std::mt19937& random, PacmanIndividual& pacman, GhostIndividual
 }
 
 Game::Game(std::mt19937& random, PacmanIndividual& pacman, GhostIndividual& ghost) :
-	buffer(new char[buffer_size])
+	buffer(new char[buffer_size]), pacman_controller(pacman.pacman_controller), ghost_controller(ghost.ghost_controller)
 {
 	int time_remaining = time_limit;
 
