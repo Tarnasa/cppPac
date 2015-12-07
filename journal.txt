@@ -56,9 +56,8 @@ Cumulative average fitness
 Remove termination from convergence
 Config for ghost pool
 Store competitor trees in game
-2c:
 Hall of fame
-Write integers, not floats
+2c:
 Do Todo:'s
 OPTIMIZE:
 Create gamestate delta for deciding best action

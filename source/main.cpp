@@ -136,8 +136,8 @@ int main(int argc, char** argv)
 		int tournament_size_ghost = arg_tournament_size_ghost.getValue().size() ? arg_tournament_size_ghost.getValue().back() : 5;
 
 		int random_seed_value = arg_random_seed.getValue().size() ? arg_random_seed.getValue().back() : -1;
-		int runs_value = arg_runs.getValue().size() ? arg_runs.getValue().back() : 5;
-		int evals_value = arg_evals.getValue().size() ? arg_evals.getValue().back() : 4000;
+		int runs_value = arg_runs.getValue().size() ? arg_runs.getValue().back() : 30;
+		int evals_value = arg_evals.getValue().size() ? arg_evals.getValue().back() : 2000;
 		
 		std::string world_filename_value = arg_world_filename.getValue().size() ? arg_world_filename.getValue().back() : "default.world";
 		std::string score_filename_value = arg_score_filename.getValue().size() ? arg_score_filename.getValue().back() : "default.score";
