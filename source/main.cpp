@@ -292,9 +292,9 @@ int main(int argc, char** argv)
 					int heros_remaining = history_depth_pacman;
 					for (auto&& riter = hall_of_fame.rbegin(); riter != hall_of_fame.rend(); ++riter)
 					{
+						if (heros_remaining-- <= 0) break;
 						Game::fight(random, pacman_child, riter->second);
 						evals += 1;
-						if (--heros_remaining <= 0) break;
 					}
 				}
 				for (auto&& ghost_child : ghost_children)
@@ -306,9 +306,9 @@ int main(int argc, char** argv)
 					int heros_remaining = history_depth_ghost;
 					for (auto&& riter = hall_of_fame.rbegin(); riter != hall_of_fame.rend(); ++riter)
 					{
+						if (heros_remaining-- <= 0) break;
 						Game::fight(random, riter->first, ghost_child);
 						evals += 1;
-						if (--heros_remaining <= 0) break;
 					}
 				}
 				// Clear out hero's memories

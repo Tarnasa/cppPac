@@ -44,7 +44,12 @@ namespace PacmanController
 
 		explicit PacmanController(const PacmanController& rhs)
 		{
-			root.children.emplace_back(Brain::copy_tree(rhs.root.children[0]));
+			// Stupid fix for gcc not being smart enough to use move constructor
+			// http://stackoverflow.com/questions/18655588/vector-reallocation-uses-copy-instead-of-move-constructor
+			if (rhs.root.children.size())
+			{
+				root.children.emplace_back(Brain::copy_tree(rhs.root.children[0]));
+			}
 		}
 
 		PacmanController& operator=(const PacmanController& rhs)
