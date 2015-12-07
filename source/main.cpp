@@ -34,16 +34,27 @@ int main(int argc, char** argv)
 		TCLAP::MultiArg<int> arg_board_height("g", "height", "The height of the playing board.", false, "Integer");
 		TCLAP::MultiArg<double> arg_pill_density("p", "density", "The chance that a cell will contain a pill", false, "Decimal between 0 and 1");
 
-		TCLAP::MultiArg<int> arg_populate_size("z", "population", "The number of individuals kept after each generation", false, "Integer");
-		TCLAP::MultiArg<int> arg_children_size("l", "children", "The number of new individuals created during recombination", false, "Integer");
-		TCLAP::MultiArg<double> arg_mutation_chance("m", "mutation", "The chance that the children will be mutated", false, "Decimal between 0 and 1");
-		TCLAP::MultiArg<int> arg_initialization_height("v", "levels", "The maximum number of levels of the starting population", false, "Integer");
-		TCLAP::MultiArg<double> arg_parsimony_pressure("y", "parsimony", "f'(x) = f(x) + maximum_possible_fitness - parsimony_pressure * (# of nodes)", false, "Decimal");
-		TCLAP::MultiArg<int> arg_maximum_stale_generations("t", "converge", "The number of non-improving best fitness generations before the run is terminated (-1 to not use)", false, "Integer");
+		TCLAP::MultiArg<int> arg_populate_size_pacman("", "pacman_population", "The number of individuals kept after each generation for pacman", false, "Integer");
+		TCLAP::MultiArg<int> arg_children_size_pacman("", "pacman_children", "The number of new individuals created during recombination for pacman", false, "Integer");
+		TCLAP::MultiArg<double> arg_mutation_chance_pacman("", "pacman_mutation", "The chance that the children will be mutated for pacman", false, "Decimal between 0 and 1");
+		TCLAP::MultiArg<int> arg_initialization_height_pacman("", "pacman_levels", "The maximum number of levels of the starting population for pacman", false, "Integer");
+		TCLAP::MultiArg<double> arg_parsimony_pressure_pacman("", "pacman_parsimony", "f'(x) = f(x) + maximum_possible_fitness - parsimony_pressure * (# of nodes) for pacman", false, "Decimal");
+		//TCLAP::MultiArg<int> arg_maximum_stale_generations_pacman("", "pacman_converge", "The number of non-improving best fitness generations before the run is terminated (-1 to not use) for pacman", false, "Integer");
 
-		TCLAP::MultiArg<std::string> arg_parent_selection("a", "parent", "The method used to select parents", false, "One of [fps, overselection]");
-		TCLAP::MultiArg<std::string> arg_survival_selection("i", "survival", "The method used to select survivors", false, "One of [truncation, ktourn]");
-		TCLAP::MultiArg<int> arg_tournament_size("k", "tournamentsize", "The tournament size if kTournament is used", false, "Integer");
+		TCLAP::MultiArg<std::string> arg_parent_selection_pacman("", "pacman_parent", "The method used to select parents for pacman", false, "One of [fps, overselection]");
+		TCLAP::MultiArg<std::string> arg_survival_selection_pacman("", "pacman_survival", "The method used to select survivors for pacman", false, "One of [truncation, ktourn]");
+		TCLAP::MultiArg<int> arg_tournament_size_pacman("", "pacman_tournamentsize", "The tournament size if kTournament is used for pacman", false, "Integer");
+
+		TCLAP::MultiArg<int> arg_populate_size_ghost("", "ghost_population", "The number of individuals kept after each generation for ghosts", false, "Integer");
+		TCLAP::MultiArg<int> arg_children_size_ghost("", "ghost_children", "The number of new individuals created during recombination for ghosts", false, "Integer");
+		TCLAP::MultiArg<double> arg_mutation_chance_ghost("", "ghost_mutation", "The chance that the children will be mutated for ghosts", false, "Decimal between 0 and 1");
+		TCLAP::MultiArg<int> arg_initialization_height_ghost("", "ghost_levels", "The maximum number of levels of the starting population for ghosts", false, "Integer");
+		TCLAP::MultiArg<double> arg_parsimony_pressure_ghost("", "ghost_parsimony", "f'(x) = f(x) + maximum_possible_fitness - parsimony_pressure * (# of nodes) for ghosts", false, "Decimal");
+		//TCLAP::MultiArg<int> arg_maximum_stale_generations_ghost("", "ghost_converge", "The number of non-improving best fitness generations before the run is terminated (-1 to not use) for ghosts", false, "Integer");
+
+		TCLAP::MultiArg<std::string> arg_parent_selection_ghost("a", "ghost_parent", "The method used to select parents for ghosts", false, "One of [fps, overselection]");
+		TCLAP::MultiArg<std::string> arg_survival_selection_ghost("i", "ghost_survival", "The method used to select survivors for ghosts", false, "One of [truncation, ktourn]");
+		TCLAP::MultiArg<int> arg_tournament_size_ghost("k", "ghost_tournamentsize", "The tournament size if kTournament is used for ghosts", false, "Integer");
 
 		TCLAP::MultiArg<int> arg_random_seed("s", "seed", "A number to seed the random number generator with, or -1 to seed with current time.", false, "Integer");
 		TCLAP::MultiArg<int> arg_runs("r", "runs", "The number of runs.", false, "Integer");
@@ -57,16 +68,27 @@ int main(int argc, char** argv)
 		cmd.add(arg_board_height);
 		cmd.add(arg_pill_density);
 
-		cmd.add(arg_populate_size);
-		cmd.add(arg_children_size);
-		cmd.add(arg_mutation_chance);
-		cmd.add(arg_initialization_height);
-		cmd.add(arg_parsimony_pressure);
-		cmd.add(arg_maximum_stale_generations);
+		cmd.add(arg_populate_size_pacman);
+		cmd.add(arg_children_size_pacman);
+		cmd.add(arg_mutation_chance_pacman);
+		cmd.add(arg_initialization_height_pacman);
+		cmd.add(arg_parsimony_pressure_pacman);
+		//cmd.add(arg_maximum_stale_generations_pacman);
 
-		cmd.add(arg_parent_selection);
-		cmd.add(arg_survival_selection);
-		cmd.add(arg_tournament_size);
+		cmd.add(arg_parent_selection_pacman);
+		cmd.add(arg_survival_selection_pacman);
+		cmd.add(arg_tournament_size_pacman);
+
+		cmd.add(arg_populate_size_ghost);
+		cmd.add(arg_children_size_ghost);
+		cmd.add(arg_mutation_chance_ghost);
+		cmd.add(arg_initialization_height_ghost);
+		cmd.add(arg_parsimony_pressure_ghost);
+		//cmd.add(arg_maximum_stale_generations_ghost);
+
+		cmd.add(arg_parent_selection_ghost);
+		cmd.add(arg_survival_selection_ghost);
+		cmd.add(arg_tournament_size_ghost);
 
 		cmd.add(arg_random_seed);
 		cmd.add(arg_runs);
@@ -85,16 +107,27 @@ int main(int argc, char** argv)
 		int height = arg_board_height.getValue().size() ? arg_board_height.getValue().back() : 20;
 		double density = arg_pill_density.getValue().size() ? arg_pill_density.getValue().back() : 0.5;
 
-		int population_size = arg_populate_size.getValue().size() ? arg_populate_size.getValue().back() : 50;
-		int children_size = arg_children_size.getValue().size() ? arg_children_size.getValue().back() : 40;
-		double mutation_chance = arg_mutation_chance.getValue().size() ? arg_mutation_chance.getValue().back() : 0.05;
-		int initialization_height = arg_initialization_height.getValue().size() ? arg_initialization_height.getValue().back() : 5;
-		double parsimony_pressure = arg_parsimony_pressure.getValue().size() ? arg_parsimony_pressure.getValue().back() : 0.15;
-		int maximum_stale_generations = arg_maximum_stale_generations.getValue().size() ? arg_maximum_stale_generations.getValue().back() : -1;
+		int population_size_pacman = arg_populate_size_pacman.getValue().size() ? arg_populate_size_pacman.getValue().back() : 50;
+		int children_size_pacman = arg_children_size_pacman.getValue().size() ? arg_children_size_pacman.getValue().back() : 40;
+		double mutation_chance_pacman = arg_mutation_chance_pacman.getValue().size() ? arg_mutation_chance_pacman.getValue().back() : 0.05;
+		int initialization_height_pacman = arg_initialization_height_pacman.getValue().size() ? arg_initialization_height_pacman.getValue().back() : 5;
+		double parsimony_pressure_pacman = arg_parsimony_pressure_pacman.getValue().size() ? arg_parsimony_pressure_pacman.getValue().back() : 0.15;
+		//int maximum_stale_generations_pacman = arg_maximum_stale_generations_pacman.getValue().size() ? arg_maximum_stale_generations_pacman.getValue().back() : -1;
 		
-		std::string parent_selection = arg_parent_selection.getValue().size() ? arg_parent_selection.getValue().back() : "overselection";
-		std::string survival_selection = arg_survival_selection.getValue().size() ? arg_survival_selection.getValue().back() : "truncation";
-		int tournament_size = arg_tournament_size.getValue().size() ? arg_tournament_size.getValue().back() : 5;
+		std::string parent_selection_pacman = arg_parent_selection_pacman.getValue().size() ? arg_parent_selection_pacman.getValue().back() : "overselection";
+		std::string survival_selection_pacman = arg_survival_selection_pacman.getValue().size() ? arg_survival_selection_pacman.getValue().back() : "truncation";
+		int tournament_size_pacman = arg_tournament_size_pacman.getValue().size() ? arg_tournament_size_pacman.getValue().back() : 5;
+
+		int population_size_ghost = arg_populate_size_ghost.getValue().size() ? arg_populate_size_ghost.getValue().back() : 50;
+		int children_size_ghost = arg_children_size_ghost.getValue().size() ? arg_children_size_ghost.getValue().back() : 40;
+		double mutation_chance_ghost = arg_mutation_chance_ghost.getValue().size() ? arg_mutation_chance_ghost.getValue().back() : 0.05;
+		int initialization_height_ghost = arg_initialization_height_ghost.getValue().size() ? arg_initialization_height_ghost.getValue().back() : 5;
+		double parsimony_pressure_ghost = arg_parsimony_pressure_ghost.getValue().size() ? arg_parsimony_pressure_ghost.getValue().back() : 0.15;
+		//int maximum_stale_generations_ghost = arg_maximum_stale_generations_ghost.getValue().size() ? arg_maximum_stale_generations_ghost.getValue().back() : -1;
+
+		std::string parent_selection_ghost = arg_parent_selection_ghost.getValue().size() ? arg_parent_selection_ghost.getValue().back() : "overselection";
+		std::string survival_selection_ghost = arg_survival_selection_ghost.getValue().size() ? arg_survival_selection_ghost.getValue().back() : "truncation";
+		int tournament_size_ghost = arg_tournament_size_ghost.getValue().size() ? arg_tournament_size_ghost.getValue().back() : 5;
 
 		int random_seed_value = arg_random_seed.getValue().size() ? arg_random_seed.getValue().back() : -1;
 		int runs_value = arg_runs.getValue().size() ? arg_runs.getValue().back() : 30;
@@ -104,16 +137,21 @@ int main(int argc, char** argv)
 		std::string score_filename_value = arg_score_filename.getValue().size() ? arg_score_filename.getValue().back() : "default.score";
 		std::string solution_filename_value = arg_solution_filename.getValue().size() ? arg_solution_filename.getValue().back() : "default.solution";
 
-		// More config logic
-		int time_limit = width * height * 2;
-		int seed = static_cast<int>(random_seed_value < 0 ? time(nullptr) : random_seed_value);
 		// Treat negative as no convergence termination criteria
-		if (maximum_stale_generations <= 0) maximum_stale_generations = std::numeric_limits<int>::max();
+		//if (maximum_stale_generations_pacman <= 0) maximum_stale_generations_pacman = std::numeric_limits<int>::max();
+		//if (maximum_stale_generations_ghost <= 0) maximum_stale_generations_ghost = std::numeric_limits<int>::max();
+		// Time limit is visiting every square twice
+		int time_limit = width * height * 2;
+		// Use random seed if given value is negative
+		int seed = static_cast<int>(random_seed_value < 0 ? time(nullptr) : random_seed_value);
 		std::mt19937 random(seed);
-		enum ParentSelector { FPS, OVERSELECTION } parent_selector = FPS;
-		enum SurvivalSelector { TRUNCATION, KTOURNAMENT } survival_selector = TRUNCATION;
-		if (parent_selection == "overselection") parent_selector = OVERSELECTION;
-		if (survival_selection == "ktourn") survival_selector = KTOURNAMENT;
+		// Choose selectors
+		enum ParentSelector { FPS, OVERSELECTION } parent_selector_pacman = FPS, parent_selector_ghost = FPS;
+		enum SurvivalSelector { TRUNCATION, KTOURNAMENT } survival_selector_pacman = TRUNCATION, survival_selector_ghost = TRUNCATION;
+		if (parent_selection_pacman == "overselection") parent_selector_pacman = OVERSELECTION;
+		if (survival_selection_pacman == "ktourn") survival_selector_pacman = KTOURNAMENT;
+		if (parent_selection_ghost == "overselection") parent_selector_ghost = OVERSELECTION;
+		if (survival_selection_ghost == "ktourn") survival_selector_ghost = KTOURNAMENT;
 
 		// Calculate maximum length of buffer needed to store log file for a single eval
 		int length_of_step = get_printf_length(128, "m %i %i\n", width, height) * 4 + get_printf_length(128, "t %i %i\n", time_limit, width * height);
@@ -139,29 +177,34 @@ int main(int argc, char** argv)
 
 		// Log and print out configuration options
 		print_args(score_file, 
-			width, height, density, population_size, children_size, mutation_chance,
-			initialization_height, parsimony_pressure, maximum_stale_generations, parent_selection, survival_selection,
-			tournament_size, seed, runs_value, evals_value, world_filename_value,
+			width, height, density, population_size_pacman, children_size_pacman, mutation_chance_pacman,
+			initialization_height_pacman, parsimony_pressure_pacman, parent_selection_pacman, survival_selection_pacman,
+			tournament_size_pacman, population_size_ghost, children_size_ghost, mutation_chance_ghost,
+			initialization_height_ghost, parsimony_pressure_ghost, parent_selection_ghost, survival_selection_ghost,
+			tournament_size_ghost, seed, runs_value, evals_value, world_filename_value,
 			score_filename_value, solution_filename_value);
 
-		// Keep track of best overall individual
-		PacmanIndividual best_individual;
-		best_individual.fitness = 0;
+		// Keep track of best overall individuals
+		PacmanIndividual best_pacman;
+		best_pacman.fitness = 0;
+		PacmanIndividual best_ghost;
+		best_pacman.fitness = 0;
 
 		// Run the EA!
 		for (int run = 0; run < runs_value; ++run)
 		{
-			// Keep track of best individual for the run
-			PacmanIndividual best_run_individual;
-			best_run_individual.fitness = 0;
+			// Keep track of best individuals for the run
+			PacmanIndividual best_run_pacman;
+			best_run_pacman.fitness = 0;
+			PacmanIndividual best_run_ghost;
+			best_run_ghost.fitness = 0;
 
 			// Termination checkers
 			int evals = 0;
-			int generations_since_improvement = 0;
 
 			// Initialize the set of individuals
-			auto pacmans = Initializers::RampedHalfAndHalf<PacmanIndividual>(random, population_size, initialization_height, parsimony_pressure);
-			auto ghosts = Initializers::RampedHalfAndHalf<GhostIndividual>(random, population_size, initialization_height, parsimony_pressure);
+			auto pacmans = Initializers::RampedHalfAndHalf<PacmanIndividual>(random, population_size_pacman, initialization_height_pacman, parsimony_pressure_pacman);
+			auto ghosts = Initializers::RampedHalfAndHalf<GhostIndividual>(random, population_size_ghost, initialization_height_ghost, parsimony_pressure_ghost);
 			int larger = pacmans.size() > ghosts.size() ? pacmans.size() : ghosts.size();
 			for (int i = 0; i < larger; ++i)
 			{
@@ -177,32 +220,35 @@ int main(int argc, char** argv)
 			
 			printf("Run %i...\n", run + 1);
 			fprintf(score_file, "\nRun %i\n", run + 1);
-			while (evals < evals_value && generations_since_improvement < maximum_stale_generations)
+			while (evals < evals_value)
 			{
 				// Generate parent pairs
 				std::vector<std::vector<int>> pacman_parent_indices;
-				if (parent_selector == FPS)
-					pacman_parent_indices = Parenting::FPS<PacmanIndividual>(random, pacmans, children_size / 2);
+				if (parent_selector_pacman == FPS)
+					pacman_parent_indices = Parenting::FPS<PacmanIndividual>(random, pacmans, children_size_pacman / 2);
 				else
-					pacman_parent_indices = Parenting::overselection<PacmanIndividual>(random, pacmans, children_size / 2);
+					pacman_parent_indices = Parenting::overselection<PacmanIndividual>(random, pacmans, children_size_pacman / 2);
 
 				std::vector<std::vector<int>> ghost_parent_indices;
-				if (parent_selector == FPS)
-					ghost_parent_indices = Parenting::FPS<GhostIndividual>(random, ghosts, children_size / 2);
+				if (parent_selector_ghost == FPS)
+					ghost_parent_indices = Parenting::FPS<GhostIndividual>(random, ghosts, children_size_ghost / 2);
 				else
-					ghost_parent_indices = Parenting::overselection<GhostIndividual>(random, ghosts, children_size / 2);
+					ghost_parent_indices = Parenting::overselection<GhostIndividual>(random, ghosts, children_size_ghost / 2);
 
 				// Generate children from pairs of parents
 				auto pacman_children = Parenting::generate_children(random, pacmans, pacman_parent_indices);
 				auto ghost_children = Parenting::generate_children(random, ghosts, ghost_parent_indices);
 
 				// Randomly apply mutation to children
-				if (chance(random, mutation_chance))
+				if (chance(random, mutation_chance_pacman))
 				{
 					for (auto&& child : pacman_children)
-						Brain::mutate(random, &child.pacman_controller.root, initialization_height, false);
+						Brain::mutate(random, &child.pacman_controller.root, initialization_height_pacman, false);
+				}
+				if (chance(random, mutation_chance_ghost))
+				{
 					for (auto&& child : ghost_children)
-						Brain::mutate(random, &child.ghost_controller.root, initialization_height, true);
+						Brain::mutate(random, &child.ghost_controller.root, initialization_height_ghost, true);
 				}
 
 				// Evaluate children by fighting them against a random individual from the previous generation
@@ -222,14 +268,9 @@ int main(int argc, char** argv)
 				std::sort(ghost_children.begin(), ghost_children.end(), [&](const GhostIndividual& a, const GhostIndividual& b) { return a.fitness > b.fitness; });
 
 				// Check for improvement, Record best child
-				if (pacman_children[0].fitness > best_run_individual.fitness)
+				if (pacman_children[0].fitness > best_run_pacman.fitness)
 				{
-					best_run_individual = pacman_children[0];
-					generations_since_improvement = 0;
-				}
-				else
-				{
-					generations_since_improvement += 1;
+					best_run_pacman = pacman_children[0];
 				}
 
 				// Merge children into individuals
@@ -243,36 +284,37 @@ int main(int argc, char** argv)
 				std::sort(ghosts.begin(), ghosts.end(), [&](const GhostIndividual& a, const GhostIndividual& b) { return a.fitness > b.fitness; });
 
 				// Choose survivors from combined individuals + children pool
-				if (survival_selector == TRUNCATION)
-					Survival::truncate<PacmanIndividual>(pacmans, population_size);
+				if (survival_selector_pacman == TRUNCATION)
+					Survival::truncate<PacmanIndividual>(pacmans, population_size_pacman);
 				else
-					Survival::kTournament<PacmanIndividual>(random, pacmans, population_size, tournament_size);
+					Survival::kTournament<PacmanIndividual>(random, pacmans, population_size_pacman, tournament_size_pacman);
 
-				if (survival_selector == TRUNCATION)
-					Survival::truncate<GhostIndividual>(ghosts, population_size);
+				if (survival_selector_ghost == TRUNCATION)
+					Survival::truncate<GhostIndividual>(ghosts, population_size_ghost);
 				else
-					Survival::kTournament<GhostIndividual>(random, ghosts, population_size, tournament_size);
+					Survival::kTournament<GhostIndividual>(random, ghosts, population_size_ghost, tournament_size_ghost);
 
 				double average_pacman_fitness = average(pacmans, [&](const PacmanIndividual& i) {return i.game_fitness; });
 				double average_ghost_fitness = average(ghosts, [&](const GhostIndividual& i) {return i.fitness; });
-				fprintf(score_file, "%i\t%f\t%f\n", evals, average_pacman_fitness, best_run_individual.game_fitness);
+				fprintf(score_file, "%i\t%f\t%f\n", evals, average_pacman_fitness, best_run_pacman.game_fitness);
 
 				printf("pacman: %f, ghost: %f\n", average_pacman_fitness, average_ghost_fitness);
+				std::cout << "Best: " << Brain::ToEquation(&pacmans[0].pacman_controller.root) << "\n";
 			} // Finished with run
 
 			// Ignore best individual of entire run and just find best individual of final population
-			if (pacmans[0].fitness > best_individual.fitness)
+			if (pacmans[0].fitness > best_pacman.fitness)
 			{
-				best_individual = pacmans[0];
+				best_pacman = pacmans[0];
 			}
 		} // Finished with EA
 
 		// Choose most representative game of best_individual
 		double best_difference = std::numeric_limits<double>::max();
 		std::shared_ptr<Game> best_game;
-		for (auto&& game : best_individual.games)
+		for (auto&& game : best_pacman.games)
 		{
-			double difference = abs(game->fitness - best_individual.game_fitness);
+			double difference = abs(game->fitness - best_pacman.game_fitness);
 			if (difference < best_difference)
 			{
 				difference = best_difference;
@@ -283,11 +325,10 @@ int main(int argc, char** argv)
 		fclose(score_file);
 		fprintf(world_file, "%s", best_game->buffer.get());
 		fclose(world_file);
-		fprintf(solution_file, "%f : %s\n", best_individual.game_fitness, Brain::ToEquation(&best_individual.pacman_controller.root).c_str());
+		fprintf(solution_file, "%f : %s\n", best_pacman.game_fitness, Brain::ToEquation(&best_pacman.pacman_controller.root).c_str());
 		fclose(solution_file);
 
-		std::cout << Brain::ToEquation(&best_individual.pacman_controller.root) << "\n";
-		std::cout << Brain::ToEquation(&best_individual.pacman_controller.root) << "\n";
+		std::cout << "Games: " << best_pacman.games.size() << " score: " << Brain::ToEquation(&best_pacman.pacman_controller.root) << "\n";
 
 		puts("Done!\n");
 	}

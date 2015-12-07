@@ -53,10 +53,11 @@ GhostIndivual
 Cumulative average fitness
 	Move buffer into Game
 	in main.cpp
-2c:
-Do Todo:'s
+Remove termination from convergence
 Config for ghost pool
+2c:
 Write integers, not floats
+Do Todo:'s
 OPTIMIZE:
 Create gamestate delta for deciding best action
 Separate update distances for pacman and ghost

@@ -20,6 +20,8 @@ public:
 	int fitness;
 	std::unique_ptr<char> buffer;
 
+
+
 	static void fight(std::mt19937& random, PacmanIndividual& pacman, GhostIndividual& ghost);
 
 //private:
