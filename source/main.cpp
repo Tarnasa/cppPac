@@ -227,10 +227,6 @@ int main(int argc, char** argv)
 			// Initialize the set of individuals
 			auto pacmans = Initializers::RampedHalfAndHalf<PacmanIndividual>(random, population_size_pacman, initialization_height_pacman, parsimony_pressure_pacman);
 			auto ghosts = Initializers::RampedHalfAndHalf<GhostIndividual>(random, population_size_ghost, initialization_height_ghost, parsimony_pressure_ghost);
-			delete pacmans[0].pacman_controller.root.children[0];
-			pacmans[0].pacman_controller.root.children[0] = Brain::from_s_expression(random, "/(D, G)");
-			delete ghosts[0].ghost_controller.root.children[0];
-			ghosts[0].ghost_controller.root.children[0] = Brain::from_s_expression(random, "R(c0.5, g)");
 			// Evaluate them
 			int larger = pacmans.size() > ghosts.size() ? pacmans.size() : ghosts.size();
 			for (int i = 0; i < larger; ++i)

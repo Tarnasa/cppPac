@@ -57,7 +57,9 @@ Remove termination from convergence
 Config for ghost pool
 Store competitor trees in game
 Hall of fame
+Ability to specify NO history
 2c:
+Remove best_run_pacman
 Do Todo:'s
 OPTIMIZE:
 Create gamestate delta for deciding best action
